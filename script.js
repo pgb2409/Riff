@@ -584,7 +584,6 @@ const bpmDetectionStatus = document.getElementById('bpmDetectionStatus');
 playbackRateSlider.addEventListener('input', () => {
   const rate = parseFloat(playbackRateSlider.value);
   playbackRateValue.textContent = rate + 'x';
-  // Intentar con pitch-preserving (si el navegador lo permite)
   try {
     audioPlayer.playbackRate = rate;
   } catch (e) {
@@ -592,12 +591,204 @@ playbackRateSlider.addEventListener('input', () => {
   }
 });
 
-// Detección de BPM (opcional, con advertencia)
+// Detección de BPM (información)
 detectBpmBtn.addEventListener('click', () => {
   if (!currentAudioFileName) {
     bpmDetectionStatus.textContent = 'Primero sube un archivo de audio.';
     return;
   }
-  bpmDetectionStatus.textContent = 'La detección automática de BPM requiere una librería externa (web-audio-beat-detector). ' +
-                                   'Por ahora, ingresa el BPM manualmente.';
+  bpmDetectionStatus.textContent = 'La detección automática requiere librerías externas. Por ahora, configura el BPM manualmente.';
+});
+
+// === ✅ Etapa 8: Exportar práctica sincronizada ===
+
+const exportPracticeBtn = document.getElementById('exportPractice');
+let currentAudioFile = null;
+let currentScoreFile = null;
+
+audioFileInput.addEventListener('change', (e) => {
+  currentAudioFile = e.target.files[0];
+  updateExportButton();
+});
+
+scoreFileInput.addEventListener('change', (e) => {
+  currentScoreFile = e.target.files[0];
+  updateExportButton();
+});
+
+function updateExportButton() {
+  const ready = currentAudioFile && currentScoreFile && bpm > 0;
+  exportPracticeBtn.disabled = !ready;
+}
+
+function generateOfflineHTML(config) {
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Práctica Offline - Music Student</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; background: #f9f9f9; }
+    #scoreContainer { margin-top: 20px; text-align: center; min-height: 400px; }
+    canvas, img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+    #currentMeasureIndicator {
+      position: fixed; top: 10px; right: 10px;
+      background: rgba(0,0,0,0.7); color: white; padding: 6px 12px;
+      border-radius: 4px; font-weight: bold; z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <h2>🎵 Práctica Offline</h2>
+  <audio id="audioPlayer" controls style="width:100%"></audio>
+  <div id="scoreContainer"></div>
+  <div id="currentMeasureIndicator">Compás: <span id="measure">0</span></div>
+
+  <script src="pdfjs/pdf.min.js"></script>
+  <script>
+    const config = ${JSON.stringify(config)};
+    
+    // Configurar worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/pdf.worker.min.js';
+    
+    const audioPlayer = document.getElementById('audioPlayer');
+    const scoreContainer = document.getElementById('scoreContainer');
+    const measureEl = document.getElementById('measure');
+
+    // Cargar audio
+    audioPlayer.src = config.audioFileName;
+    
+    let overlayCanvas = null;
+    const measuresPerRow = 4;
+    const visibleRows = 3;
+    const totalMeasures = measuresPerRow * visibleRows;
+
+    // Cargar partitura
+    window.addEventListener('load', async () => {
+      const scoreFile = config.scoreFileName;
+      const ext = scoreFile.split('.').pop().toLowerCase();
+      
+      if (ext === 'pdf') {
+        try {
+          const response = await fetch(scoreFile);
+          const arrayBuffer = await response.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({  new Uint8Array(arrayBuffer) }).promise;
+          const page = await pdf.getPage(1);
+          const scale = 1.5;
+          const viewport = page.getViewport({ scale });
+          const canvas = document.createElement('canvas');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          scoreContainer.appendChild(canvas);
+          const ctx = canvas.getContext('2d');
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          createOverlay(canvas);
+        } catch (e) {
+          scoreContainer.innerHTML = '<p>Error al cargar PDF.</p>';
+        }
+      } else {
+        const img = document.createElement('img');
+        img.src = scoreFile;
+        img.onload = () => createOverlay(img);
+        scoreContainer.appendChild(img);
+      }
+    });
+
+    function createOverlay(element) {
+      const rect = element.getBoundingClientRect();
+      overlayCanvas = document.createElement('canvas');
+      overlayCanvas.width = rect.width;
+      overlayCanvas.height = rect.height;
+      overlayCanvas.style.position = 'fixed';
+      overlayCanvas.style.left = rect.left + 'px';
+      overlayCanvas.style.top = rect.top + 'px';
+      overlayCanvas.style.pointerEvents = 'none';
+      overlayCanvas.style.zIndex = '10';
+      document.body.appendChild(overlayCanvas);
+    }
+
+    function clearOverlay() {
+      if (overlayCanvas) {
+        const ctx = overlayCanvas.getContext('2d');
+        ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+      }
+    }
+
+    function highlightMeasure(index) {
+      if (!overlayCanvas || index < 0 || index >= totalMeasures) {
+        clearOverlay();
+        return;
+      }
+      const ctx = overlayCanvas.getContext('2d');
+      clearOverlay();
+      const cols = measuresPerRow;
+      const rows = visibleRows;
+      const col = index % cols;
+      const row = Math.floor(index / cols);
+      const w = overlayCanvas.width / cols;
+      const h = overlayCanvas.height / rows;
+      ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+      ctx.fillRect(col * w, row * h, w, h);
+      ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(col * w, row * h, w, h);
+    }
+
+    // Sincronización
+    setInterval(() => {
+      if (!config.bpm) return;
+      const syncTime = audioPlayer.currentTime + config.offset;
+      const measure = Math.floor(syncTime / (60 / config.bpm));
+      measureEl.textContent = measure + 1;
+      highlightMeasure(measure);
+    }, 100);
+  </script>
+</body>
+</html>`;
+}
+
+exportPracticeBtn.addEventListener('click', async () => {
+  if (!currentAudioFile || !currentScoreFile || !bpm) {
+    alert('Completa la configuración antes de descargar.');
+    return;
+  }
+
+  const zip = new JSZip();
+  
+  // Añadir archivos del usuario
+  zip.file(currentAudioFile.name, currentAudioFile);
+  zip.file(currentScoreFile.name, currentScoreFile);
+  
+  // Añadir PDF.js
+  const pdfjsFiles = ['pdfjs/pdf.min.js', 'pdfjs/pdf.worker.min.js'];
+  for (const path of pdfjsFiles) {
+    try {
+      const response = await fetch(path);
+      const blob = await response.blob();
+      zip.file(path, blob);
+    } catch (e) {
+      console.warn('No se pudo incluir PDF.js:', e);
+    }
+  }
+  
+  // Configuración
+  const config = {
+    audioFileName: currentAudioFile.name,
+    scoreFileName: currentScoreFile.name,
+    bpm: bpm,
+    offset: currentOffset,
+    loopFrom: loopFromMeasure,
+    loopTo: loopToMeasure,
+    structureMarks: structureMarksInput.value
+  };
+  
+  // HTML offline
+  const htmlContent = generateOfflineHTML(config);
+  zip.file('index.html', htmlContent);
+  
+  // Descargar
+  const content = await zip.generateAsync({ type: 'blob' });
+  saveAs(content, 'practica-musica-offline.zip');
+  
+  alert('¡Listo! Abre el ZIP y haz doble clic en "index.html" para practicar sin internet.');
 });
