@@ -572,3 +572,32 @@ structureMarksInput.addEventListener('input', () => {
   parseStructureMarks(structureMarksInput.value);
   showStructureBar();
 });
+
+// === Etapa 7: Mejoras avanzadas (NUEVO) ===
+
+const playbackRateSlider = document.getElementById('playbackRate');
+const playbackRateValue = document.getElementById('playbackRateValue');
+const detectBpmBtn = document.getElementById('detectBpm');
+const bpmDetectionStatus = document.getElementById('bpmDetectionStatus');
+
+// Velocidad variable
+playbackRateSlider.addEventListener('input', () => {
+  const rate = parseFloat(playbackRateSlider.value);
+  playbackRateValue.textContent = rate + 'x';
+  // Intentar con pitch-preserving (si el navegador lo permite)
+  try {
+    audioPlayer.playbackRate = rate;
+  } catch (e) {
+    bpmDetectionStatus.textContent = 'Tu navegador no permite cambiar la velocidad sin alterar el tono.';
+  }
+});
+
+// Detección de BPM (opcional, con advertencia)
+detectBpmBtn.addEventListener('click', () => {
+  if (!currentAudioFileName) {
+    bpmDetectionStatus.textContent = 'Primero sube un archivo de audio.';
+    return;
+  }
+  bpmDetectionStatus.textContent = 'La detección automática de BPM requiere una librería externa (web-audio-beat-detector). ' +
+                                   'Por ahora, ingresa el BPM manualmente.';
+});
