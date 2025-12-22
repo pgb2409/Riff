@@ -138,3 +138,11 @@ button:disabled {
   font-weight: bold;
   margin-top: 10px;
 }
+
+/* Estilo para las pistas explicativas */
+.hint {
+  font-size: 0.9em;
+  color: #555;
+  margin: 5px 0 10px 0;
+  line-height: 1.4;
+}
