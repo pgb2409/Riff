@@ -19,6 +19,18 @@
       <h1>Domina tu <span>instrumento</span></h1>
       <p>Sincronización de audio y partituras en tiempo real con resaltado inteligente.</p>
       
+      <!-- Estadísticas -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number" id="userCount">0</div>
+          <div class="stat-label">Usuarios registrados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="downloadCount">0</div>
+          <div class="stat-label">Prácticas descargadas</div>
+        </div>
+      </div>
+
       <!-- Formulario de registro -->
       <div id="registerForm">
         <h3>Crear cuenta</h3>
@@ -241,11 +253,13 @@
     <script src="script.js"></script>
   </div>
 
-  <!-- Script para manejar login/registro -->
+  <!-- Script para manejar login/registro y estadísticas -->
   <script>
     // === Gestión de usuarios (localStorage) ===
     const usersKey = 'musicApp_users';
     const currentUserKey = 'musicApp_currentUser';
+    const USER_COUNT_KEY = 'musicApp_userCount';
+    const DOWNLOAD_COUNT_KEY = 'musicApp_downloadCount';
 
     function saveUser(name, lastname, email, password) {
       let users = JSON.parse(localStorage.getItem(usersKey) || '[]');
@@ -253,6 +267,10 @@
       if (!exists) {
         users.push({ name, lastname, email, password });
         localStorage.setItem(usersKey, JSON.stringify(users));
+        
+        // Incrementar contador de usuarios
+        const userCount = parseInt(localStorage.getItem(USER_COUNT_KEY) || '0') + 1;
+        localStorage.setItem(USER_COUNT_KEY, userCount.toString());
       }
       localStorage.setItem(currentUserKey, email);
       return { name, lastname, email };
@@ -280,8 +298,23 @@
       localStorage.removeItem(currentUserKey);
     }
 
+    // Mostrar estadísticas
+    function displayStats() {
+      const userCountEl = document.getElementById('userCount');
+      const downloadCountEl = document.getElementById('downloadCount');
+      
+      if (userCountEl && downloadCountEl) {
+        const userCount = parseInt(localStorage.getItem(USER_COUNT_KEY) || '0');
+        const downloadCount = parseInt(localStorage.getItem(DOWNLOAD_COUNT_KEY) || '0');
+        userCountEl.textContent = userCount;
+        downloadCountEl.textContent = downloadCount;
+      }
+    }
+
     // === Manejo de formularios ===
     document.addEventListener('DOMContentLoaded', () => {
+      displayStats();
+      
       const registerForm = document.getElementById('registerForm');
       const loginForm = document.getElementById('loginForm');
       const showLogin = document.getElementById('showLogin');
