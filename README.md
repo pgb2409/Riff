@@ -1,4 +1,4 @@
-# Music Student MVP – Etapa 1 + Etapa 2
+# Music Student MVP – Etapa 1 + 2 + 3
 
 App para estudiantes de música, 100% offline, sin backend, lista para GitHub Pages.
 
@@ -6,25 +6,25 @@ App para estudiantes de música, 100% offline, sin backend, lista para GitHub Pa
 - Subir audio (MP3/MP4)
 - Subir partitura (PDF, JPG, PNG)
 - Reproducción con controles básicos
-- Visualización de PDF con **PDF.js** (confiable, offline)
-- Botón **“La primera nota entra aquí”** → ajusta offset automáticamente
-- Guardado automático del offset por nombre de archivo en `localStorage`
+- PDF.js integrado
+- Botón “La primera nota entra aquí”
+- Guardado de offset en localStorage
 
-## ✅ Etapa 2: Sincronización rítmica básica
-- Campo para ingresar **BPM**
-- Cálculo automático de duración de compás: `60 / BPM`
-- Indicador fijo de **compás actual** en la esquina superior derecha
-- **Resaltado visual del compás actual** usando una capa transparente sobre la partitura
-  - Asume partitura con compases alineados en renglones fijos (ej. fotocopias)
-  - Layout predeterminado: 4 compases por renglón, 3 renglones visibles
-- Modo **“seguir siempre”**: la sincronización continúa incluso si el alumno no interactúa
+## ✅ Etapa 2
+- BPM y cálculo de compás
+- Indicador fijo de compás actual
+- Resaltado visual con overlay
+- Modo “seguir siempre”
+
+## ✅ Etapa 3: Controles en vivo + loop
+- Botones **+0.2s / –0.2s** para ajuste fino del offset en tiempo real
+- Saltos rápidos: **◄◄ 2, ◄ 1, 1 ►, 2 ►►** (avanza/retrocede en compases)
+- **Loop por rango de compases** (ej. 5–8)
+- **Guardado automático de loops** por nombre de archivo en `localStorage`
 
 ## 🛠️ Cómo usar
-1. Descarga la última versión de [PDF.js](https://github.com/mozilla/pdf.js/releases)
-2. Extrae `pdf.min.js` y `pdf.worker.min.js` → colócalos en la carpeta `pdfjs/`
-3. Abre `index.html` en tu navegador
-4. ¡Listo! Funciona sin conexión.
-
-> ✨ Totalmente gratuito, sin frameworks, sin cuenta, sin internet.
+1. Descarga PDF.js y coloca `pdf.min.js` y `pdf.worker.min.js` en `/pdfjs/`
+2. Abre `index.html`
+3. ¡Listo! Todo funciona sin conexión.
 
 Hecho con ❤️ para estudiantes de música.
