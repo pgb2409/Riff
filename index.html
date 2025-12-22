@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Music Student MVP</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Etapa 7: PWA -->
+  <link rel="manifest" href="manifest.json" />
 </head>
 <body>
   <h1>🎵 App para Estudiantes de Música (MVP)</h1>
@@ -131,6 +133,19 @@
     <p id="modeStatus">Modo actual: Normal</p>
     <p class="hint">• <strong>Solo forma</strong>: oculta la partitura, útil para memorizar.  
        • <strong>Solo mirar</strong>: avanza sin audio, ideal para estudiar el ritmo antes de tocar.</p>
+  </section>
+
+  <!-- Etapa 7: Mejoras avanzadas -->
+  <section id="advancedFeaturesSection">
+    <h3>🔬 Mejoras avanzadas</h3>
+    
+    <label for="playbackRate">Velocidad de reproducción:</label>
+    <p class="hint">Ajusta la velocidad sin cambiar el tono (si el navegador lo permite).</p>
+    <input type="range" id="playbackRate" min="0.5" max="2" step="0.1" value="1" />
+    <span id="playbackRateValue">1x</span>
+    
+    <button id="detectBpm" style="margin-top: 10px;">Detectar BPM automáticamente</button>
+    <p id="bpmDetectionStatus" style="font-size: 0.9em; color: #555;"></p>
   </section>
 
   <!-- Marcas de estructura (Etapa 6) -->
