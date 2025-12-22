@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Music Student MVP</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Etapa 7: PWA -->
-  <link rel="manifest" href="manifest.json" />
+  <link rel="manifest" href="/manifest.json" />
 </head>
 <body>
   <h1>🎵 App para Estudiantes de Música (MVP)</h1>
@@ -162,20 +161,14 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/pdf.worker.min.js';
   </script>
   <script src="script.js"></script>
+
+  <!-- ✅ Activar soporte offline (PWA) -->
   <script>
-  // Registrar Service Worker para soporte offline
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(console.warn);
-    });
-  }
-</script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(console.warn);
-    });
-  }
-</script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(console.warn);
+      });
+    }
+  </script>
 </body>
 </html>
