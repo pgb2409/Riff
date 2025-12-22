@@ -409,7 +409,7 @@ let lookModeActive = false;
 
 toggleFormModeBtn.addEventListener('click', () => {
   formModeActive = !formModeActive;
-  lookModeActive = false; // solo uno a la vez
+  lookModeActive = false;
 
   if (formModeActive) {
     scoreContainer.style.display = 'none';
@@ -424,7 +424,7 @@ toggleFormModeBtn.addEventListener('click', () => {
 
 toggleLookModeBtn.addEventListener('click', () => {
   lookModeActive = !lookModeActive;
-  formModeActive = false; // solo uno a la vez
+  formModeActive = false;
 
   if (lookModeActive) {
     audioPlayer.pause();
@@ -437,4 +437,138 @@ toggleLookModeBtn.addEventListener('click', () => {
     modeStatus.textContent = 'Modo actual: Normal';
     modeStatus.style.color = '#333';
   }
+});
+
+// === Etapa 6: Modo profesor + compartición (NUEVO) ===
+
+const teacherBpmInput = document.getElementById('teacherBpm');
+const teacherOffsetInput = document.getElementById('teacherOffset');
+const structureMarksInput = document.getElementById('structureMarks');
+const teacherLoopFromInput = document.getElementById('teacherLoopFrom');
+const teacherLoopToInput = document.getElementById('teacherLoopTo');
+const generateLinkBtn = document.getElementById('generateLink');
+const shareLinkEl = document.getElementById('shareLink');
+const structureBar = document.getElementById('structureBar');
+
+let structureMap = {};
+
+// Cargar desde URL al iniciar
+window.addEventListener('load', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlBpm = urlParams.get('bpm');
+  const urlOffset = urlParams.get('offset');
+  const urlFrom = urlParams.get('from');
+  const urlTo = urlParams.get('to');
+  const urlMarks = urlParams.get('marks');
+
+  if (urlBpm) {
+    bpmInput.value = urlBpm;
+    teacherBpmInput.value = urlBpm;
+    bpm = parseFloat(urlBpm);
+    measureDuration = 60 / bpm;
+    measureInfo.textContent = `Duración de compás: ${measureDuration.toFixed(2)} segundos`;
+  }
+  if (urlOffset) {
+    currentOffset = parseFloat(urlOffset);
+    manualOffsetInput.value = currentOffset;
+    teacherOffsetInput.value = currentOffset;
+    offsetStatus.textContent = `Desfase actual: ${currentOffset.toFixed(1)}s (de enlace)`;
+  }
+  if (urlFrom && urlTo) {
+    loopFromInput.value = urlFrom;
+    loopToInput.value = urlTo;
+    teacherLoopFromInput.value = urlFrom;
+    teacherLoopToInput.value = urlTo;
+    loopFromMeasure = parseInt(urlFrom);
+    loopToMeasure = parseInt(urlTo);
+    loopActive = true;
+    loopStatus.textContent = `Loop activo: compases ${urlFrom} a ${urlTo} (de enlace)`;
+    loopStatus.style.color = '#2c7';
+  }
+  if (urlMarks) {
+    structureMarksInput.value = decodeURIComponent(urlMarks);
+    parseStructureMarks(urlMarks);
+    showStructureBar();
+  }
+});
+
+function parseStructureMarks(marksStr) {
+  structureMap = {};
+  if (!marksStr) return;
+  const pairs = marksStr.split(',');
+  pairs.forEach(pair => {
+    const [measure, label] = pair.split(':');
+    const m = parseInt(measure);
+    if (!isNaN(m) && label) {
+      structureMap[m] = label;
+    }
+  });
+}
+
+function showStructureBar() {
+  if (Object.keys(structureMap).length === 0) {
+    structureBar.style.display = 'none';
+    return;
+  }
+  let html = '';
+  for (const measure in structureMap) {
+    html += `<span style="margin: 0 10px;">Compás ${measure}: ${structureMap[measure]}</span>`;
+  }
+  structureBar.innerHTML = html;
+  structureBar.style.display = 'block';
+}
+
+generateLinkBtn.addEventListener('click', () => {
+  const bpmVal = teacherBpmInput.value;
+  const offsetVal = teacherOffsetInput.value;
+  const fromVal = teacherLoopFromInput.value;
+  const toVal = teacherLoopToInput.value;
+  const marksVal = structureMarksInput.value.trim();
+
+  if (!bpmVal) {
+    alert('Ingresa el BPM.');
+    return;
+  }
+
+  const baseUrl = window.location.origin + window.location.pathname;
+  const params = new URLSearchParams();
+
+  params.append('bpm', bpmVal);
+  if (offsetVal) params.append('offset', offsetVal);
+  if (fromVal && toVal) {
+    params.append('from', fromVal);
+    params.append('to', toVal);
+  }
+  if (marksVal) {
+    params.append('marks', encodeURIComponent(marksVal));
+  }
+
+  const fullUrl = baseUrl + '?' + params.toString();
+  shareLinkEl.textContent = fullUrl;
+  shareLinkEl.style.display = 'block';
+
+  // Opcional: copiar al portapapeles
+  navigator.clipboard?.writeText(fullUrl).then(() => {
+    alert('¡Enlace copiado al portapapeles!');
+  });
+});
+
+// Sincronizar campos del profesor con los principales
+teacherBpmInput.addEventListener('input', () => {
+  bpmInput.value = teacherBpmInput.value;
+});
+teacherOffsetInput.addEventListener('input', () => {
+  manualOffsetInput.value = teacherOffsetInput.value;
+});
+teacherLoopFromInput.addEventListener('input', () => {
+  loopFromInput.value = teacherLoopFromInput.value;
+});
+teacherLoopToInput.addEventListener('input', () => {
+  loopToInput.value = teacherLoopToInput.value;
+});
+
+// Cargar marcas cuando cambien
+structureMarksInput.addEventListener('input', () => {
+  parseStructureMarks(structureMarksInput.value);
+  showStructureBar();
 });
