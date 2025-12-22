@@ -64,6 +64,7 @@ scoreFileInput.addEventListener('change', async function (e) {
 
   if (file.type === 'application/pdf') {
     try {
+      // Intentar con PDF.js
       const arrayBuffer = await file.arrayBuffer();
       const typedarray = new Uint8Array(arrayBuffer);
       const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
@@ -81,8 +82,16 @@ scoreFileInput.addEventListener('change', async function (e) {
 
       await page.render({ canvasContext: context, viewport }).promise;
     } catch (err) {
-      scoreContainer.innerHTML = '<p>Error al cargar el PDF. Asegúrate de que el archivo sea válido.</p>';
-      console.error('Error PDF:', err);
+      // Si falla, usar fallback con <embed>
+      console.warn('PDF.js falló. Usando fallback con <embed>.', err);
+      const url = URL.createObjectURL(file);
+      const embed = document.createElement('embed');
+      embed.src = url;
+      embed.type = 'application/pdf';
+      embed.width = '100%';
+      embed.height = '600px';
+      scoreContainer.innerHTML = '';
+      scoreContainer.appendChild(embed);
     }
   } else if (file.type.startsWith('image/')) {
     const url = URL.createObjectURL(file);
