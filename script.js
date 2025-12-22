@@ -66,7 +66,7 @@ scoreFileInput.addEventListener('change', async function (e) {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const typedarray = new Uint8Array(arrayBuffer);
-      const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+      const pdf = await pdfjsLib.getDocument({  typedarray }).promise;
       const page = await pdf.getPage(1);
       const scale = 1.5;
       const viewport = page.getViewport({ scale });
@@ -365,7 +365,6 @@ const pulseCircle = document.getElementById('pulseCircle');
 let pulseInterval = null;
 let countdownActive = false;
 
-// Parpadear el círculo
 function pulse() {
   pulseCircle.style.opacity = '1';
   setTimeout(() => {
@@ -374,7 +373,6 @@ function pulse() {
   }, 150);
 }
 
-// Iniciar cuenta atrás de 1 compás
 startCountdownBtn.addEventListener('click', () => {
   if (!bpm || bpm <= 0) {
     alert('Primero ingresa un BPM válido.');
@@ -384,11 +382,11 @@ startCountdownBtn.addEventListener('click', () => {
   if (pulseInterval) clearInterval(pulseInterval);
 
   countdownActive = true;
-  const beatDuration = 60 / bpm; // en segundos
-  const beatsPerMeasure = 4; // asumimos 4/4
+  const beatDuration = 60 / bpm;
+  const beatsPerMeasure = 4;
   let beatCount = 0;
 
-  pulse(); // pulso inicial inmediato
+  pulse();
 
   pulseInterval = setInterval(() => {
     beatCount++;
@@ -398,4 +396,45 @@ startCountdownBtn.addEventListener('click', () => {
       countdownActive = false;
     }
   }, beatDuration * 1000);
+});
+
+// === Etapa 5: Modos de visualización (NUEVO) ===
+
+const toggleFormModeBtn = document.getElementById('toggleFormMode');
+const toggleLookModeBtn = document.getElementById('toggleLookMode');
+const modeStatus = document.getElementById('modeStatus');
+
+let formModeActive = false;
+let lookModeActive = false;
+
+toggleFormModeBtn.addEventListener('click', () => {
+  formModeActive = !formModeActive;
+  lookModeActive = false; // solo uno a la vez
+
+  if (formModeActive) {
+    scoreContainer.style.display = 'none';
+    modeStatus.textContent = 'Modo actual: Solo forma';
+    modeStatus.style.color = '#2c7';
+  } else {
+    scoreContainer.style.display = 'block';
+    modeStatus.textContent = 'Modo actual: Normal';
+    modeStatus.style.color = '#333';
+  }
+});
+
+toggleLookModeBtn.addEventListener('click', () => {
+  lookModeActive = !lookModeActive;
+  formModeActive = false; // solo uno a la vez
+
+  if (lookModeActive) {
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
+    audioPlayer.style.display = 'none';
+    modeStatus.textContent = 'Modo actual: Solo mirar';
+    modeStatus.style.color = '#2c7';
+  } else {
+    audioPlayer.style.display = 'block';
+    modeStatus.textContent = 'Modo actual: Normal';
+    modeStatus.style.color = '#333';
+  }
 });
