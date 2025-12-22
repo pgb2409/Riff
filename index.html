@@ -5,287 +5,880 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Domina tu instrumento</title>
   <style>
-    /* --- Diseño oscuro profesional --- */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #0f0c1a;
-      color: #f0f0f0;
+      background-color: #0f0c1a;
+      color: #fff;
+      line-height: 1.6;
+    }
+
+    .screen {
+      min-height: 100vh;
       padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #1a132a;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      padding: 25px;
-    }
-    h1 {
+
+    /* Pantalla de bienvenida */
+    #welcomeScreen {
+      background: linear-gradient(135deg, #0f0c1a 0%, #1a132a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      margin-bottom: 20px;
-      color: #5e4aff;
+      padding: 40px 20px;
     }
-    .section {
-      margin: 25px 0;
-      padding: 20px;
-      background: #251e35;
-      border-radius: 10px;
-    }
-    .section h2 {
-      margin-bottom: 15px;
-      color: #5e4aff;
-    }
-    input[type="file"],
-    select,
-    input[type="number"],
-    button {
+
+    .header {
       width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #444;
-      border-radius: 6px;
-      background: #2c243a;
-      color: white;
-      font-size: 1rem;
+      max-width: 800px;
+      margin-bottom: 40px;
+      position: relative;
     }
-    select {
-      background: #2c243a url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      padding-right: 30px;
-    }
-    button {
-      background: linear-gradient(135deg, #5e4aff 0%, #3b2cff 100%);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: none;
-    }
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(94, 74, 255, 0.4);
-    }
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    #scoreContainer {
-      margin-top: 15px;
-      text-align: center;
-      min-height: 300px;
-      border: 1px dashed #555;
-      border-radius: 8px;
+
+    .logo {
+      background: rgba(255, 255, 255, 0.1);
+      width: 80px;
+      height: 80px;
+      border-radius: 15px;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .icon {
+      font-size: 32px;
+      color: #fff;
+    }
+
+    .waveform {
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(to right, 
+        rgba(0, 123, 255, 0.1) 0%,
+        rgba(0, 123, 255, 0.5) 50%,
+        rgba(0, 123, 255, 0.1) 100%);
+      background-size: 100% 100%;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+
+    .content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    h1 span {
+      color: #5e4aff;
+      font-weight: 600;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #ccc;
+      margin: 15px 0;
+    }
+
+    /* Estadísticas */
+    .stats {
+      display: flex;
+      gap: 20px;
+      margin: 20px 0;
+      justify-content: center;
+    }
+
+    .stat-card {
+      background: rgba(94, 74, 255, 0.15);
+      padding: 15px 20px;
+      border-radius: 12px;
+      text-align: center;
+      min-width: 140px;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #5e4aff;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 5px;
+    }
+
+    @media (max-width: 480px) {
+      .stats {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    .progress {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 20px 0;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #888;
+      border-radius: 50%;
+    }
+
+    .dot.active {
+      background: #5e4aff;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #5e4aff 0%, #3b2cff 100%);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(94, 74, 255, 0.5);
+    }
+
+    .login-link {
+      margin-top: 20px;
+      font-size: 0.9rem;
       color: #aaa;
     }
+
+    .login-link a {
+      color: #5e4aff;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    /* Formularios de login/registro */
+    #registerForm,
+    #loginForm {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 25px;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 20px;
+    }
+
+    #registerForm h3,
+    #loginForm h3 {
+      margin-bottom: 15px;
+      color: #fff;
+      font-size: 1.3rem;
+    }
+
+    #registerForm input,
+    #loginForm input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1rem;
+    }
+
+    #registerForm input::placeholder,
+    #loginForm input::placeholder {
+      color: #aaa;
+    }
+
+    #registerForm button,
+    #loginForm button {
+      width: 100%;
+      padding: 12px;
+      margin: 15px 0;
+    }
+
+    .terms {
+      margin: 15px 0;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    .terms label {
+      display: block;
+      margin: 8px 0;
+      cursor: pointer;
+    }
+
+    .terms input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.2);
+    }
+
+    .terms a {
+      color: #5e4aff;
+      text-decoration: underline;
+    }
+
+    .switch-form {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    .switch-form a {
+      color: #5e4aff;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .footer-links {
+      margin-top: 30px;
+      color: #777;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    /* Selector de instrumento */
+    .instrument-select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 15px;
+      border-radius: 5px;
+      border: 1px solid #333;
+      background: #2c243a;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    /* App principal */
+    .app-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background: #1a132a;
+      border-bottom: 1px solid #333;
+      margin-bottom: 20px;
+    }
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .app-header h2 {
+      font-size: 1.5rem;
+      color: #fff;
+    }
+
+    /* Secciones generales */
+    .upload-section,
+    .config-section,
+    .control-section,
+    #stepContainer {
+      background: #1a132a;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      width: 100%;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .upload-section label,
+    .config-section label,
+    .control-section label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .upload-section input[type="file"],
+    .config-section input[type="number"],
+    .control-section input[type="number"],
+    .control-section input[type="range"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #333;
+      background: #2c243a;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .upload-section input[type="file"]:focus,
+    .config-section input[type="number"]:focus,
+    .control-section input[type="number"]:focus,
+    .control-section input[type="range"]:focus {
+      outline: none;
+      border-color: #5e4aff;
+      box-shadow: 0 0 5px rgba(94, 74, 255, 0.5);
+    }
+
+    .upload-section button,
+    .config-section button,
+    .control-section button {
+      background: linear-gradient(135deg, #5e4aff 0%, #3b2cff 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .upload-section button:hover,
+    .config-section button:hover,
+    .control-section button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(94, 74, 255, 0.3);
+    }
+
+    .hint {
+      font-size: 0.9em;
+      color: #aaa;
+      margin: 5px 0 10px 0;
+      line-height: 1.4;
+    }
+
+    /* Botones de control */
+    .live-controls-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .live-controls-row button {
+      flex: 1;
+      min-width: 60px;
+      width: auto;
+    }
+
+    #pulseContainer {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    #pulseCircle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #4CAF50;
+      opacity: 0.3;
+      transition: opacity 0.1s;
+    }
+
+    /* Indicador fijo de compás actual */
+    #currentMeasureIndicator {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+
+    /* Barra de estructura */
+    #structureBar {
+      position: fixed;
+      top: 50px;
+      left: 0;
+      right: 0;
+      background: #333;
+      color: white;
+      padding: 5px;
+      text-align: center;
+      z-index: 999;
+    }
+
+    /* Pie de página */
+    .footer-actions {
+      margin-top: 30px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Estilos específicos */
     #scoreContainer img,
     #scoreContainer canvas {
       max-width: 100%;
       height: auto;
+      margin-top: 10px;
+      border: 1px solid #ddd;
       border-radius: 4px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
-    #currentMeasureIndicator {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(231, 76, 60, 0.9);
-      color: white;
+
+    /* Botones de modo */
+    #toggleFormMode,
+    #toggleLookMode {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: none;
       padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-      z-index: 1000;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin: 5px;
     }
-    .stats {
+
+    #toggleFormMode:hover,
+    #toggleLookMode:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Botón de exportación */
+    #exportPractice {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    #exportPractice:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+
+    #exportPractice:disabled {
+      background: #888;
+      cursor: not-allowed;
+    }
+
+    /* Ajustes de responsividad */
+    @media (max-width: 768px) {
+      .app-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .btn-back {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .app-header h2 {
+        font-size: 1.2rem;
+      }
+
+      .upload-section,
+      .config-section,
+      .control-section {
+        padding: 15px;
+        margin: 15px 0;
+      }
+
+      .live-controls-row {
+        flex-direction: column;
+      }
+
+      .btn-primary {
+        font-size: 1rem;
+        padding: 12px 20px;
+      }
+
+      .progress {
+        gap: 5px;
+      }
+
+      .dot {
+        width: 6px;
+        height: 6px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #registerForm,
+      #loginForm {
+        padding: 20px;
+      }
+      
+      .content {
+        padding: 0 15px;
+      }
+    }
+
+    /* Paso de flujo */
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .nav-buttons {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .nav-buttons button {
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-prev {
+      background: #555;
+      color: white;
+    }
+
+    .btn-next {
+      background: #5e4aff;
+      color: white;
+    }
+
+    .btn-done {
+      background: #4CAF50;
+      color: white;
+    }
+
+    /* Instrucciones en pasos */
+    .instructions {
       background: rgba(94, 74, 255, 0.1);
       padding: 15px;
       border-radius: 8px;
-      margin: 20px 0;
+      margin: 15px 0;
     }
-    .stat-card {
-      text-align: center;
-    }
-    .stat-number {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #5e4aff;
-    }
-    .hint {
-      font-size: 0.9rem;
-      color: #aaa;
+
+    .instructions ul {
+      padding-left: 20px;
       margin: 10px 0;
-      line-height: 1.5;
     }
-    .admin-panel {
-      background: rgba(243, 156, 18, 0.1);
-      border-left: 4px solid #f39c12;
-      padding: 15px;
-      margin-top: 20px;
-    }
-    details > summary {
-      cursor: pointer;
-      color: #5e4aff;
-      font-weight: bold;
-    }
-    @media (max-width: 600px) {
-      .container { margin: 10px; padding: 15px; }
-      .stats { flex-direction: column; gap: 10px; }
+
+    .instructions li {
+      margin: 8px 0;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎵 Domina tu instrumento</h1>
-    
-    <!-- Estadísticas -->
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-number" id="userCount">0</div>
-        <div>Usuarios</div>
+  <!-- Pantalla de bienvenida (RESTAURADA) -->
+  <div id="welcomeScreen" class="screen">
+    <div class="header">
+      <div class="logo">
+        <div class="icon">🎵</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-number" id="downloadCount">0</div>
-        <div>Prácticas</div>
-      </div>
+      <div class="waveform"></div>
     </div>
-
-    <!-- Paso único -->
-    <div class="section" id="uploadSection">
-      <h2>1. Prepara tu práctica</h2>
-      <p class="hint">Sube tu audio, tu partitura y elige tu instrumento. ¡La app hará el resto!</p>
+    <div class="content">
+      <h1>Domina tu <span>instrumento</span></h1>
+      <p>Sincronización de audio y partituras en tiempo real con resaltado inteligente.</p>
       
-      <label>Audio (MP3 o MP4):</label>
-      <input type="file" id="audioFile" accept="audio/mp3,audio/mpeg,video/mp4" />
-      
-      <label>Partitura (PDF, JPG o PNG):</label>
-      <input type="file" id="scoreFile" accept=".pdf,.jpg,.jpeg,.png" />
-      
-      <label>Tu instrumento:</label>
-      <select id="instrumentSelect">
-        <option value="">Selecciona tu instrumento</option>
-        <option value="bateria">Batería</option>
-        <option value="guitarra">Guitarra</option>
-        <option value="bajo">Bajo</option>
-        <option value="piano">Piano/Teclado</option>
-        <option value="voz">Voz</option>
-        <option value="saxo">Saxo</option>
-        <option value="trompeta">Trompeta</option>
-        <option value="violin">Violín</option>
-        <option value="flauta">Flauta</option>
-        <option value="otro">Otro</option>
-      </select>
-      
-      <button id="startPractice" disabled>▶️ Empezar a practicar</button>
-    </div>
-
-    <!-- Vista de práctica -->
-    <div id="practiceView" style="display: none;">
-      <div class="section">
-        <h2>2. ¡Practica!</h2>
-        <audio id="audioPlayer" controls style="width: 100%; margin: 10px 0; background: #2c243a; padding: 10px; border-radius: 6px;"></audio>
-        <div id="scoreContainer">Sube tu partitura para verla aquí</div>
+      <!-- Estadísticas -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number" id="userCount">0</div>
+          <div class="stat-label">Usuarios registrados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="downloadCount">0</div>
+          <div class="stat-label">Prácticas descargadas</div>
+        </div>
       </div>
 
-      <details class="section">
-        <summary>⚙️ Ajustes avanzados</summary>
-        <label>BPM (tempo):</label>
-        <input type="number" id="bpmInput" value="120" min="20" max="300" />
-        <label>Offset (segundos):</label>
-        <input type="number" id="manualOffset" step="0.1" value="0" />
-        <button id="applyOffset">Aplicar ajuste</button>
-        <label>Rango de loop:</label>
-        <input type="number" id="loopFrom" value="1" min="1" placeholder="Desde" style="width: 48%; margin-right: 4%;" />
-        <input type="number" id="loopTo" value="4" min="1" placeholder="Hasta" style="width: 48%;" />
-        <button id="setLoop">Establecer loop</button>
-        <button id="exportPractice">💾 Descargar práctica offline</button>
-      </details>
-    </div>
+      <!-- Formulario de registro -->
+      <div id="registerForm">
+        <h3>Crear cuenta</h3>
+        <input type="text" id="regName" placeholder="Nombre" />
+        <input type="text" id="regLastname" placeholder="Apellidos" />
+        <input type="email" id="regEmail" placeholder="Correo electrónico" />
+        <input type="password" id="regPassword" placeholder="Contraseña" />
+        <input type="password" id="regConfirmPassword" placeholder="Confirmar contraseña" />
+        
+        <div class="terms">
+          <label>
+            <input type="checkbox" id="termsCheckbox" />
+            Acepto los <a href="#" target="_blank">términos de uso</a>
+          </label>
+          <label>
+            <input type="checkbox" id="privacyCheckbox" />
+            He leído la <a href="#" target="_blank">política de protección de datos</a>
+          </label>
+        </div>
+        
+        <button id="registerBtn" class="btn-primary">Crear cuenta</button>
+        <p class="switch-form">¿Ya tienes cuenta? <a id="showLogin">Inicia sesión</a></p>
+      </div>
 
-    <div id="adminPanel" class="admin-panel" style="display: none;">
-      <h3>🔐 Panel de administración</h3>
-      <button id="resetCounters">Restablecer contadores</button>
-      <div id="userList"></div>
+      <!-- Formulario de login (oculto por defecto) -->
+      <div id="loginForm" style="display: none;">
+        <h3>Iniciar sesión</h3>
+        <input type="email" id="loginEmail" placeholder="Correo electrónico" />
+        <input type="password" id="loginPassword" placeholder="Contraseña" />
+        <button id="loginBtn" class="btn-primary">Entrar</button>
+        <p class="switch-form">¿Eres nuevo? <a id="showRegister">Regístrate</a></p>
+      </div>
+
+      <div class="footer-links">
+        <p>Tus datos se guardan únicamente en tu dispositivo.</p>
+      </div>
     </div>
   </div>
 
-  <div id="currentMeasureIndicator" style="display: none;">
-    Compás: <span id="measureNumber">0</span>
+  <!-- App principal UNIFICADA -->
+  <div id="appContainer" class="screen" style="display: none; align-items: stretch;">
+    <div class="app-header">
+      <button id="backToWelcome" class="btn-back">← Salir</button>
+      <h2>🎵 Hola, <span id="userNameDisplay">Usuario</span></h2>
+    </div>
+
+    <div id="stepContainer">
+      <!-- ÚNICO PASO: todo junto -->
+      <div id="step1" class="step active">
+        <h3>1. Sube tu audio, tu partitura y elige tu instrumento</h3>
+        <div class="instructions">
+          <p><strong>¿Qué debes hacer?</strong></p>
+          <ul>
+            <li>Sube el <strong>archivo de audio</strong> (MP3 o MP4) de la pieza.</li>
+            <li>Sube la <strong>partitura correspondiente</strong> (PDF, JPG, PNG).</li>
+            <li>Elige <strong>tu instrumento</strong> de la lista.</li>
+            <li>La app sincronizará automáticamente. ¡No necesitas hacer nada más!</li>
+          </ul>
+        </div>
+
+        <!-- Audio -->
+        <label for="audioFile">Audio (MP3 o MP4):</label>
+        <input type="file" id="audioFile" accept="audio/mp3,audio/mpeg,video/mp4" />
+        <audio id="audioPlayer" controls style="width: 100%; margin: 10px 0;"></audio>
+
+        <!-- Instrumento -->
+        <label for="instrumentSelect">Tu instrumento:</label>
+        <select id="instrumentSelect" class="instrument-select">
+          <option value="">Selecciona tu instrumento</option>
+          <option value="bateria">Batería</option>
+          <option value="guitarra">Guitarra</option>
+          <option value="bajo">Bajo</option>
+          <option value="piano">Piano/Teclado</option>
+          <option value="voz">Voz</option>
+          <option value="saxo">Saxo</option>
+          <option value="trompeta">Trompeta</option>
+          <option value="violin">Violín</option>
+          <option value="flauta">Flauta</option>
+          <option value="otro">Otro</option>
+        </select>
+
+        <!-- Partitura -->
+        <label for="scoreFile">Tu partitura (PDF, JPG o PNG):</label>
+        <input type="file" id="scoreFile" accept=".pdf,.jpg,.jpeg,.png" />
+        <div id="scoreContainer" style="margin: 15px 0; text-align: center; min-height: 300px;"></div>
+
+        <!-- Sincronización automática (sin botón) -->
+        <p id="offsetStatus" style="margin: 15px 0; text-align: center;">Sincronización automática activa</p>
+
+        <div class="nav-buttons" style="justify-content: center;">
+          <button id="next1" class="btn-done">¡Listo! Practicar ahora</button>
+        </div>
+      </div>
+
+      <!-- Paso 2: Practica -->
+      <div id="step2" class="step">
+        <h3>🎵 ¡Ya puedes practicar!</h3>
+        
+        <section id="rhythmSection" class="control-section">
+          <label for="bpmInput">BPM (beats per minute):</label>
+          <p class="hint">Escribe el tempo de la pieza (ej. 120). La app usará esto para marcar los compases.</p>
+          <input type="number" id="bpmInput" min="20" max="300" placeholder="Ej. 120" value="120" />
+          <button id="startSync">Iniciar sincronización rítmica</button>
+          <button id="stopSync">Detener</button>
+          <p id="measureInfo">Duración de compás: -- segundos</p>
+          <label>
+            <input type="checkbox" id="followMode" checked />
+            Modo “seguir siempre” (no se detiene)
+          </label>
+        </section>
+
+        <section id="liveControlsSection" class="control-section">
+          <h3>🎛️ Controles en vivo</h3>
+          <div class="live-controls-row">
+            <button id="offsetMinus">– 0.2s</button>
+            <button id="offsetPlus">+ 0.2s</button>
+          </div>
+          <p>Offset aplicado: <span id="liveOffsetDisplay">0s</span></p>
+
+          <h3>⏭️ Saltos por compases</h3>
+          <div class="live-controls-row">
+            <button id="jumpBack2">◄◄ 2</button>
+            <button id="jumpBack1">◄ 1</button>
+            <button id="jumpForward1">1 ►</button>
+            <button id="jumpForward2">2 ►►</button>
+          </div>
+
+          <h3>🔁 Loop por sección</h3>
+          <label>Desde compás: <input type="number" id="loopFrom" min="1" value="1" /></label>
+          <label>Hasta compás: <input type="number" id="loopTo" min="1" value="4" /></label>
+          <br />
+          <button id="setLoop">Establecer loop</button>
+          <button id="clearLoop">Limpiar loop</button>
+          <p id="loopStatus">Sin loop activo</p>
+        </section>
+
+        <section id="advancedSection" class="control-section">
+          <button id="toggleFormMode">Modo “solo forma”</button>
+          <button id="toggleLookMode">Modo “solo mirar”</button>
+          <button id="startCountdown">Iniciar cuenta atrás</button>
+          <button id="exportPractice" disabled>💾 Descargar práctica offline</button>
+        </section>
+
+        <div id="structureBar" style="display: none; position: fixed; top: 50px; left: 0; right: 0; background: #333; color: white; padding: 5px; text-align: center; z-index: 999;"></div>
+        <div id="currentMeasureIndicator" style="display: none;">Compás actual: <span id="currentMeasureNumber">0</span></div>
+      </div>
+    </div>
   </div>
 
   <!-- PDF.js -->
   <script src="pdfjs/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/pdf.worker.min.js';</script>
 
-  <!-- Librerías -->
+  <!-- Librerías para ZIP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
   <script>
-    const ADMIN_EMAIL = 'admin@mimusicapp.com';
-    const ADMIN_PASSWORD = 'admin123';
+    // === Claves globales ===
     const usersKey = 'musicApp_users';
     const currentUserKey = 'musicApp_currentUser';
-    const isAdminKey = 'musicApp_isAdmin';
     const USER_COUNT_KEY = 'musicApp_userCount';
     const DOWNLOAD_COUNT_KEY = 'musicApp_downloadCount';
+    const isAdminKey = 'musicApp_isAdmin';
 
+    const ADMIN_EMAIL = 'admin@mimusicapp.com';
+    const ADMIN_PASSWORD = 'admin123';
+
+    let currentAudioFileName = null;
+    let currentOffset = 0;
+    let bpm = 0;
+    let measureDuration = 0;
     let currentAudioFile = null;
     let currentScoreFile = null;
     let currentInstrument = '';
-    let currentOffset = 0;
-    let bpm = 120;
-    let measureDuration = 60 / bpm;
-    let loopFrom = null;
-    let loopTo = null;
-    let syncInterval = null;
 
+    // === DOM Elements ===
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const next1 = document.getElementById('next1');
     const audioFileInput = document.getElementById('audioFile');
-    const scoreFileInput = document.getElementById('scoreFile');
-    const instrumentSelect = document.getElementById('instrumentSelect');
-    const startPracticeBtn = document.getElementById('startPractice');
     const audioPlayer = document.getElementById('audioPlayer');
+    const scoreFileInput = document.getElementById('scoreFile');
     const scoreContainer = document.getElementById('scoreContainer');
-    const practiceView = document.getElementById('practiceView');
-    const currentMeasureIndicator = document.getElementById('currentMeasureIndicator');
-    const measureNumberEl = document.getElementById('measureNumber');
-    const uploadSection = document.getElementById('uploadSection');
+    const instrumentSelect = document.getElementById('instrumentSelect');
+    const offsetStatus = document.getElementById('offsetStatus');
 
-    function updateStartButton() {
-      const ready = currentAudioFile && currentScoreFile && currentInstrument;
-      startPracticeBtn.disabled = !ready;
-    }
-
-    audioFileInput.addEventListener('change', (e) => {
-      currentAudioFile = e.target.files[0];
-      updateStartButton();
+    // === Navegación ===
+    next1.addEventListener('click', () => {
+      step1.classList.remove('active');
+      step2.classList.add('active');
     });
 
-    scoreFileInput.addEventListener('change', (e) => {
-      currentScoreFile = e.target.files[0];
-      updateStartButton();
+    // === Audio ===
+    audioFileInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      currentAudioFile = file;
+      currentAudioFileName = file.name;
+      const url = URL.createObjectURL(file);
+      audioPlayer.src = url;
     });
 
-    instrumentSelect.addEventListener('change', () => {
-      currentInstrument = instrumentSelect.value;
-      updateStartButton();
-    });
-
-    async function loadScore(file) {
+    // === ✅ CORRECCIÓN DE PDF: Usar URL.createObjectURL como fallback ===
+    scoreFileInput.addEventListener('change', async function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      currentScoreFile = file;
       scoreContainer.innerHTML = '<p>Cargando partitura...</p>';
+
       if (file.type === 'application/pdf') {
         try {
+          // Intentar con ArrayBuffer (PDF.js moderno)
           const arrayBuffer = await file.arrayBuffer();
           const typedarray = new Uint8Array(arrayBuffer);
-          // ✅ CORRECCIÓN: quitar llaves alrededor de typedarray
           const pdf = await pdfjsLib.getDocument(typedarray).promise;
           const page = await pdf.getPage(1);
           const scale = 1.5;
@@ -297,9 +890,21 @@
           scoreContainer.appendChild(canvas);
           const context = canvas.getContext('2d');
           await page.render({ canvasContext: context, viewport }).promise;
-        } catch (e) {
-          console.error('Error al cargar PDF:', e);
-          scoreContainer.innerHTML = '<p style="color:#ff6b6b;">⚠️ No se pudo cargar el PDF. Prueba con una imagen (JPG/PNG).</p>';
+        } catch (e1) {
+          try {
+            // Fallback: usar URL.createObjectURL (compatible con más navegadores)
+            const url = URL.createObjectURL(file);
+            const embed = document.createElement('embed');
+            embed.src = url;
+            embed.type = 'application/pdf';
+            embed.width = '100%';
+            embed.height = '500px';
+            scoreContainer.innerHTML = '';
+            scoreContainer.appendChild(embed);
+          } catch (e2) {
+            scoreContainer.innerHTML = '<p style="color:#ff6b6b;">⚠️ Error al cargar PDF. Prueba con una imagen.</p>';
+            console.error('PDF error:', e1, e2);
+          }
         }
       } else if (file.type.startsWith('image/')) {
         const url = URL.createObjectURL(file);
@@ -311,78 +916,185 @@
       } else {
         scoreContainer.innerHTML = '<p style="color:#ff6b6b;">⚠️ Formato no soportado.</p>';
       }
-    }
-
-    function startSync() {
-      currentMeasureIndicator.style.display = 'block';
-      measureDuration = 60 / bpm;
-      
-      if (syncInterval) clearInterval(syncInterval);
-      syncInterval = setInterval(() => {
-        const audioTime = audioPlayer.currentTime;
-        const syncTime = audioTime + currentOffset;
-        const currentMeasure = syncTime >= 0 ? Math.floor(syncTime / measureDuration) + 1 : 0;
-        measureNumberEl.textContent = currentMeasure;
-        
-        if (loopFrom !== null && loopTo !== null && currentMeasure > loopTo) {
-          const loopStartTime = (loopFrom - 1) * measureDuration;
-          audioPlayer.currentTime = loopStartTime - currentOffset;
-        }
-      }, 100);
-    }
-
-    startPracticeBtn.addEventListener('click', async () => {
-      const audioUrl = URL.createObjectURL(currentAudioFile);
-      audioPlayer.src = audioUrl;
-      await loadScore(currentScoreFile);
-      
-      uploadSection.style.display = 'none';
-      practiceView.style.display = 'block';
-      
-      startSync();
     });
 
-    document.getElementById('applyOffset').addEventListener('click', () => {
-      currentOffset = parseFloat(document.getElementById('manualOffset').value) || 0;
+    instrumentSelect.addEventListener('change', () => {
+      currentInstrument = instrumentSelect.value;
     });
 
-    document.getElementById('bpmInput').addEventListener('change', () => {
-      bpm = parseInt(document.getElementById('bpmInput').value) || 120;
-      measureDuration = 60 / bpm;
-    });
-
-    document.getElementById('setLoop').addEventListener('click', () => {
-      const from = parseInt(document.getElementById('loopFrom').value);
-      const to = parseInt(document.getElementById('loopTo').value);
-      if (!isNaN(from) && !isNaN(to) && from <= to) {
-        loopFrom = from;
-        loopTo = to;
+    // === BPM ===
+    document.getElementById('startSync').addEventListener('click', () => {
+      const value = parseFloat(document.getElementById('bpmInput').value);
+      if (isNaN(value) || value <= 0) {
+        alert('Ingresa un BPM válido.');
+        return;
       }
+      bpm = value;
+      measureDuration = 60 / bpm;
+      document.getElementById('measureInfo').textContent = `Duración de compás: ${measureDuration.toFixed(2)}s`;
     });
+
+    // === Login/Register/Admin ===
+    function login(email, password) {
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        localStorage.setItem(isAdminKey, 'true');
+        return { name: 'Administrador', lastname: '', email, admin: true };
+      }
+      const users = JSON.parse(localStorage.getItem(usersKey) || '[]');
+      const user = users.find(u => u.email === email && u.password === password);
+      if (user) {
+        localStorage.setItem(currentUserKey, email);
+        localStorage.removeItem(isAdminKey);
+        return { name: user.name, lastname: user.lastname, email, admin: false };
+      }
+      return null;
+    }
+
+    function saveUser(name, lastname, email, password) {
+      let users = JSON.parse(localStorage.getItem(usersKey) || '[]');
+      const exists = users.some(u => u.email === email);
+      if (!exists) {
+        users.push({ name, lastname, email, password });
+        localStorage.setItem(usersKey, JSON.stringify(users));
+        const userCount = parseInt(localStorage.getItem(USER_COUNT_KEY) || '0') + 1;
+        localStorage.setItem(USER_COUNT_KEY, userCount.toString());
+      }
+      localStorage.setItem(currentUserKey, email);
+      return { name, lastname, email };
+    }
+
+    function logout() {
+      localStorage.removeItem(currentUserKey);
+      localStorage.removeItem(isAdminKey);
+    }
 
     function displayStats() {
-      document.getElementById('userCount').textContent = localStorage.getItem(USER_COUNT_KEY) || '0';
-      document.getElementById('downloadCount').textContent = localStorage.getItem(DOWNLOAD_COUNT_KEY) || '0';
+      const userCountEl = document.getElementById('userCount');
+      const downloadCountEl = document.getElementById('downloadCount');
+      if (userCountEl && downloadCountEl) {
+        const userCount = parseInt(localStorage.getItem(USER_COUNT_KEY) || '0');
+        const downloadCount = parseInt(localStorage.getItem(DOWNLOAD_COUNT_KEY) || '0');
+        userCountEl.textContent = userCount;
+        downloadCountEl.textContent = downloadCount;
+      }
     }
 
-    function isAdmin() {
-      return localStorage.getItem(isAdminKey) === 'true';
+    // === Restaurar sesión ===
+    function restoreSession() {
+      const isAdmin = localStorage.getItem(isAdminKey) === 'true';
+      const userEmail = localStorage.getItem(currentUserKey);
+
+      const welcomeScreen = document.getElementById('welcomeScreen');
+      const appContainer = document.getElementById('appContainer');
+      const userNameDisplay = document.getElementById('userNameDisplay');
+
+      if (isAdmin) {
+        userNameDisplay.textContent = 'Administrador';
+        welcomeScreen.style.display = 'none';
+        appContainer.style.display = 'flex';
+        setTimeout(() => {
+          alert('Acceso de administrador no compatible con el flujo guiado.\nUsa la versión anterior para administrar.');
+          appContainer.style.display = 'none';
+          welcomeScreen.style.display = 'flex';
+        }, 100);
+      } else if (userEmail) {
+        const users = JSON.parse(localStorage.getItem(usersKey) || '[]');
+        const user = users.find(u => u.email === userEmail);
+        if (user) {
+          userNameDisplay.textContent = `${user.name} ${user.lastname}`;
+          welcomeScreen.style.display = 'none';
+          appContainer.style.display = 'flex';
+          return;
+        }
+      }
+      welcomeScreen.style.display = 'flex';
+      appContainer.style.display = 'none';
     }
 
-    displayStats();
+    // === Inicialización ===
+    document.addEventListener('DOMContentLoaded', () => {
+      displayStats();
+      restoreSession();
 
-    if (isAdmin()) {
-      document.getElementById('adminPanel').style.display = 'block';
-      document.getElementById('resetCounters').addEventListener('click', () => {
-        if (confirm('¿Restablecer contadores?')) {
-          localStorage.setItem(USER_COUNT_KEY, '0');
-          localStorage.setItem(DOWNLOAD_COUNT_KEY, '0');
-          displayStats();
+      // Login
+      document.getElementById('showLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+      });
+
+      document.getElementById('loginBtn').addEventListener('click', () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const user = login(email, password);
+        if (user) {
+          if (user.admin) {
+            document.getElementById('userNameDisplay').textContent = 'Administrador';
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'flex';
+            setTimeout(() => {
+              alert('Acceso de administrador no compatible con el flujo guiado.\nUsa la versión anterior para administrar.');
+              document.getElementById('appContainer').style.display = 'none';
+              document.getElementById('welcomeScreen').style.display = 'flex';
+              document.getElementById('loginEmail').value = '';
+              document.getElementById('loginPassword').value = '';
+            }, 100);
+          } else {
+            document.getElementById('userNameDisplay').textContent = `${user.name} ${user.lastname}`;
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'flex';
+          }
+        } else {
+          alert('Correo o contraseña incorrectos.');
         }
       });
-      const users = JSON.parse(localStorage.getItem(usersKey) || '[]');
-      document.getElementById('userList').innerHTML = `<h4>Usuarios (${users.length}):</h4><ul>${users.map(u => `<li>${u.name} ${u.lastname}</li>`).join('')}</ul>`;
-    }
+
+      // Registro
+      document.getElementById('registerBtn').addEventListener('click', () => {
+        const name = document.getElementById('regName').value.trim();
+        const lastname = document.getElementById('regLastname').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirmPassword = document.getElementById('regConfirmPassword').value;
+        const terms = document.getElementById('termsCheckbox').checked;
+        const privacy = document.getElementById('privacyCheckbox').checked;
+
+        if (!name || !lastname || !email || !password || !confirmPassword) {
+          alert('Por favor, completa todos los campos.');
+          return;
+        }
+        if (password !== confirmPassword) {
+          alert('Las contraseñas no coinciden.');
+          return;
+        }
+        if (!terms || !privacy) {
+          alert('Debes aceptar los términos y la política de privacidad.');
+          return;
+        }
+        if (!email.includes('@')) {
+          alert('Por favor, ingresa un correo válido.');
+          return;
+        }
+
+        const user = saveUser(name, lastname, email, password);
+        document.getElementById('userNameDisplay').textContent = `${user.name} ${user.lastname}`;
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('appContainer').style.display = 'flex';
+      });
+
+      // Salir
+      document.getElementById('backToWelcome').addEventListener('click', () => {
+        logout();
+        document.getElementById('appContainer').style.display = 'none';
+        document.getElementById('welcomeScreen').style.display = 'flex';
+      });
+
+      document.getElementById('showRegister').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+      });
+    });
   </script>
 </body>
 </html>
