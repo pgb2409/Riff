@@ -230,6 +230,18 @@ p {
   text-align: center;
 }
 
+/* Selector de instrumento */
+.instrument-select {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 15px;
+  border-radius: 5px;
+  border: 1px solid #333;
+  background: #2c243a;
+  color: #fff;
+  font-size: 1rem;
+}
+
 /* App principal */
 .app-header {
   width: 100%;
