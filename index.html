@@ -704,7 +704,7 @@
     </div>
   </div>
 
-  <!-- App principal con flujo guiado -->
+  <!-- App principal UNIFICADA -->
   <div id="appContainer" class="screen" style="display: none; align-items: stretch;">
     <div class="app-header">
       <button id="backToWelcome" class="btn-back">← Salir</button>
@@ -712,36 +712,24 @@
     </div>
 
     <div id="stepContainer">
-      <!-- Paso 1: Audio -->
+      <!-- ✅ ÚNICO PASO: todo junto -->
       <div id="step1" class="step active">
-        <h3> Paso 1: Sube tu audio </h3>
+        <h3>1. Sube tu audio y tu partitura</h3>
         <div class="instructions">
           <p><strong>¿Qué debes hacer?</strong></p>
           <ul>
-            <li>Selecciona un archivo de audio en formato <strong>MP3 o MP4</strong>.</li>
-            <li>Debe ser la grabación de la pieza que vas a practicar.</li>
+            <li>Sube el <strong>archivo de audio</strong> (MP3 o MP4) de la pieza.</li>
+            <li>Elige <strong>tu instrumento</strong> y sube la <strong>partitura correspondiente</strong> (PDF, JPG, PNG).</li>
+            <li>Reproduce el audio y, en el <strong>momento exacto</strong> de la primera nota de tu instrumento, haz clic en el botón de sincronización.</li>
           </ul>
         </div>
-        <input type="file" id="audioFile" accept="audio/mp3,audio/mpeg,video/mp4" />
-        <audio id="audioPlayer" controls style="width: 100%; margin-top: 15px;"></audio>
-        <div class="nav-buttons">
-          <div></div>
-          <button id="next1" class="btn-next" disabled>Siguiente</button>
-        </div>
-      </div>
 
-      <!-- Paso 2: Partitura e instrumento -->
-      <div id="step2" class="step">
-        <h3> Paso 2: Elige tu instrumento y sube tu partitura </h3>
-        <div class="instructions">
-          <p><strong>¿Qué debes hacer?</strong></p>
-          <ul>
-            <li>Selecciona <strong>tu instrumento</strong> de la lista (ej: Batería, Guitarra).</li>
-            <li>Sube la <strong>partitura correspondiente</strong> en PDF, JPG o PNG.</li>
-            <li>Puede ser una foto, escaneo o archivo digital.</li>
-          </ul>
-        </div>
-        
+        <!-- Audio -->
+        <label for="audioFile">Audio (MP3 o MP4):</label>
+        <input type="file" id="audioFile" accept="audio/mp3,audio/mpeg,video/mp4" />
+        <audio id="audioPlayer" controls style="width: 100%; margin: 10px 0;"></audio>
+
+        <!-- Instrumento y partitura -->
         <label for="instrumentSelect">Tu instrumento:</label>
         <select id="instrumentSelect" class="instrument-select">
           <option value="">Selecciona tu instrumento</option>
@@ -759,38 +747,22 @@
 
         <label for="scoreFile">Tu partitura (PDF, JPG o PNG):</label>
         <input type="file" id="scoreFile" accept=".pdf,.jpg,.jpeg,.png" />
-        <div id="scoreContainer" style="margin-top: 15px; text-align: center; min-height: 300px;"></div>
-        <div class="nav-buttons">
-          <button id="prev2" class="btn-prev">Anterior</button>
-          <button id="next2" class="btn-next" disabled>Siguiente</button>
-        </div>
-      </div>
+        <div id="scoreContainer" style="margin: 15px 0; text-align: center; min-height: 300px;"></div>
 
-      <!-- Paso 3: Sincronización -->
-      <div id="step3" class="step">
-        <h3> Paso 3: Sincroniza audio y partitura </h3>
-        <div class="instructions">
-          <p><strong>¿Qué debes hacer?</strong></p>
-          <ul>
-            <li><strong>Reproduce el audio</strong> desde el principio.</li>
-            <li>En el <strong>momento exacto</strong> en que suena la primera nota de tu instrumento, haz clic en el botón de abajo.</li>
-            <li>¡Eso es todo! La app se encargará de alinear la partitura con el audio.</li>
-          </ul>
-        </div>
+        <!-- Sincronización -->
         <button id="markFirstNote" class="btn-primary">La primera nota entra aquí</button>
-        <p id="offsetStatus" style="margin: 15px 0;">Desfase: 0s</p>
-        <div class="nav-buttons">
-          <button id="prev3" class="btn-prev">Anterior</button>
-          <button id="next3" class="btn-done">¡Listo! Practicar ahora</button>
+        <p id="offsetStatus" style="margin: 15px 0; text-align: center;">Desfase: 0s</p>
+
+        <div class="nav-buttons" style="justify-content: center;">
+          <button id="next1" class="btn-done">¡Listo! Practicar ahora</button>
         </div>
       </div>
 
-      <!-- Paso 4: Practica (todo el resto) -->
-      <div id="step4" class="step">
+      <!-- Paso 2: Practica (todo el resto) -->
+      <div id="step2" class="step">
         <h3>🎵 ¡Ya puedes practicar!</h3>
         
-        <!-- Aquí va todo lo demás: BPM, loop, controles, etc. -->
-        <!-- Etapa 2: Sincronización rítmica -->
+        <!-- BPM, loop, controles, etc. -->
         <section id="rhythmSection" class="control-section">
           <label for="bpmInput">BPM (beats per minute):</label>
           <p class="hint">Escribe el tempo de la pieza (ej. 120). La app usará esto para marcar los compases.</p>
@@ -804,7 +776,6 @@
           </label>
         </section>
 
-        <!-- Etapa 3: Controles en vivo + loop -->
         <section id="liveControlsSection" class="control-section">
           <h3>🎛️ Controles en vivo</h3>
           <div class="live-controls-row">
@@ -830,7 +801,6 @@
           <p id="loopStatus">Sin loop activo</p>
         </section>
 
-        <!-- Etapa 4-7 y descarga -->
         <section id="advancedSection" class="control-section">
           <button id="toggleFormMode">Modo “solo forma”</button>
           <button id="toggleLookMode">Modo “solo mirar”</button>
@@ -838,7 +808,6 @@
           <button id="exportPractice" disabled>💾 Descargar práctica offline</button>
         </section>
 
-        <!-- Indicadores fijos -->
         <div id="structureBar" style="display: none; position: fixed; top: 50px; left: 0; right: 0; background: #333; color: white; padding: 5px; text-align: center; z-index: 999;"></div>
         <div id="currentMeasureIndicator" style="display: none;">Compás actual: <span id="currentMeasureNumber">0</span></div>
       </div>
@@ -853,7 +822,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-  <!-- Script completo -->
+  <!-- Script -->
   <script>
     // === Claves globales ===
     const usersKey = 'musicApp_users';
@@ -872,17 +841,10 @@
     let currentAudioFile = null;
     let currentScoreFile = null;
 
-    // === DOM Elements (pasos) ===
+    // === DOM Elements ===
     const step1 = document.getElementById('step1');
     const step2 = document.getElementById('step2');
-    const step3 = document.getElementById('step3');
-    const step4 = document.getElementById('step4');
     const next1 = document.getElementById('next1');
-    const next2 = document.getElementById('next2');
-    const next3 = document.getElementById('next3');
-    const prev2 = document.getElementById('prev2');
-    const prev3 = document.getElementById('prev3');
-
     const audioFileInput = document.getElementById('audioFile');
     const audioPlayer = document.getElementById('audioPlayer');
     const scoreFileInput = document.getElementById('scoreFile');
@@ -891,17 +853,11 @@
     const offsetStatus = document.getElementById('offsetStatus');
     const instrumentSelect = document.getElementById('instrumentSelect');
 
-    // === Manejo de pasos ===
-    function showStep(stepId) {
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-      document.getElementById(stepId).classList.add('active');
-    }
-
-    next1.addEventListener('click', () => showStep('step2'));
-    prev2.addEventListener('click', () => showStep('step1'));
-    next2.addEventListener('click', () => showStep('step3'));
-    prev3.addEventListener('click', () => showStep('step2'));
-    next3.addEventListener('click', () => showStep('step4'));
+    // === Navegación ===
+    next1.addEventListener('click', () => {
+      step1.classList.remove('active');
+      step2.classList.add('active');
+    });
 
     // === Audio ===
     audioFileInput.addEventListener('change', function (e) {
@@ -911,7 +867,6 @@
       currentAudioFileName = file.name;
       const url = URL.createObjectURL(file);
       audioPlayer.src = url;
-      next1.disabled = false;
     });
 
     // === Partitura ===
@@ -936,7 +891,6 @@
           scoreContainer.appendChild(canvas);
           const context = canvas.getContext('2d');
           await page.render({ canvasContext: context, viewport }).promise;
-          next2.disabled = false;
         } catch (e) {
           const url = URL.createObjectURL(file);
           const embed = document.createElement('embed');
@@ -946,7 +900,6 @@
           embed.height = '500px';
           scoreContainer.innerHTML = '';
           scoreContainer.appendChild(embed);
-          next2.disabled = false;
         }
       } else if (file.type.startsWith('image/')) {
         const url = URL.createObjectURL(file);
@@ -955,7 +908,6 @@
         img.style.maxWidth = '100%';
         scoreContainer.innerHTML = '';
         scoreContainer.appendChild(img);
-        next2.disabled = false;
       } else {
         scoreContainer.innerHTML = '<p>Formato no soportado.</p>';
       }
@@ -963,13 +915,16 @@
 
     // === Sincronización ===
     markFirstNoteBtn.addEventListener('click', function () {
-      if (!currentAudioFileName) return;
+      if (!currentAudioFileName) {
+        alert('Primero sube un archivo de audio.');
+        return;
+      }
       const currentTime = audioPlayer.currentTime;
       currentOffset = -currentTime;
       offsetStatus.textContent = `Desfase: ${currentOffset.toFixed(1)}s`;
     });
 
-    // === Resto de funcionalidades (BPM, loop, etc.) ===
+    // === BPM ===
     document.getElementById('startSync').addEventListener('click', () => {
       const value = parseFloat(document.getElementById('bpmInput').value);
       if (isNaN(value) || value <= 0) {
@@ -981,15 +936,12 @@
       document.getElementById('measureInfo').textContent = `Duración de compás: ${measureDuration.toFixed(2)}s`;
     });
 
-    // === ✅ FUNCIÓN LOGIN CORREGIDA ===
+    // === Login/Register/Admin (CORREGIDO) ===
     function login(email, password) {
-      // ✅ Primero: verificar admin
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         localStorage.setItem(isAdminKey, 'true');
         return { name: 'Administrador', lastname: '', email, admin: true };
       }
-      
-      // Luego: verificar usuarios normales
       const users = JSON.parse(localStorage.getItem(usersKey) || '[]');
       const user = users.find(u => u.email === email && u.password === password);
       if (user) {
@@ -1000,7 +952,6 @@
       return null;
     }
 
-    // === Resto igual ===
     function saveUser(name, lastname, email, password) {
       let users = JSON.parse(localStorage.getItem(usersKey) || '[]');
       const exists = users.some(u => u.email === email);
@@ -1034,14 +985,13 @@
     document.addEventListener('DOMContentLoaded', () => {
       displayStats();
 
-      // Activar "Inicia sesión"
+      // Login
       document.getElementById('showLogin').addEventListener('click', (e) => {
         e.preventDefault();
         document.getElementById('registerForm').style.display = 'none';
         document.getElementById('loginForm').style.display = 'block';
       });
 
-      // Login
       document.getElementById('loginBtn').addEventListener('click', () => {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
@@ -1066,6 +1016,7 @@
 
       // Registro
       document.getElementById('registerBtn').addEventListener('click', () => {
+        // ... mismo código ...
         const name = document.getElementById('regName').value.trim();
         const lastname = document.getElementById('regLastname').value.trim();
         const email = document.getElementById('regEmail').value.trim();
@@ -1104,7 +1055,6 @@
         document.getElementById('welcomeScreen').style.display = 'flex';
       });
 
-      // "Regístrate" desde login
       document.getElementById('showRegister').addEventListener('click', (e) => {
         e.preventDefault();
         document.getElementById('loginForm').style.display = 'none';
