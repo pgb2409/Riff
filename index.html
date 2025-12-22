@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Domina tu instrumento</title>
   <style>
-    /* --- Tu style.css completo aquí (sin cambios) --- */
     * {
       margin: 0;
       padding: 0;
@@ -853,7 +852,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-  <!-- Script completo (sin cambios en lógica) -->
+  <!-- Script completo -->
   <script>
     // === Claves globales ===
     const usersKey = 'musicApp_users';
@@ -981,7 +980,7 @@
       document.getElementById('measureInfo').textContent = `Duración de compás: ${measureDuration.toFixed(2)}s`;
     });
 
-    // === Login/Register/Admin (sin cambios) ===
+    // === Login/Register/Admin (CORREGIDO) ===
     function saveUser(name, lastname, email, password) {
       let users = JSON.parse(localStorage.getItem(usersKey) || '[]');
       const exists = users.some(u => u.email === email);
@@ -1037,7 +1036,13 @@
         const user = login(email, password);
         if (user) {
           if (user.admin) {
+            // ✅ CORREGIDO: vuelve a la pantalla de inicio
             alert('Acceso de administrador no compatible con el flujo guiado.\nUsa la versión anterior para administrar.');
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('welcomeScreen').style.display = 'flex';
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            return;
           } else {
             document.getElementById('userNameDisplay').textContent = `${user.name} ${user.lastname}`;
             document.getElementById('welcomeScreen').style.display = 'none';
