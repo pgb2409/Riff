@@ -79,10 +79,27 @@
 
     <!-- Score Upload -->
     <section class="upload-section">
-      <label for="scoreFile">Sube tu partitura (PDF, JPG o PNG):</label>
-      <p class="hint">Sube una foto, escaneo o PDF de tu partitura, tablatura o hoja de acordes.</p>
+      <label for="scoreFile">Sube la partitura de tu instrumento (PDF, JPG o PNG):</label>
+      <p class="hint">Ej: partitura de batería, tablatura de guitarra, hoja de acordes, etc.</p>
+      
+      <label for="instrumentSelect">Elige tu instrumento:</label>
+      <select id="instrumentSelect" class="instrument-select">
+        <option value="">Selecciona tu instrumento</option>
+        <option value="bateria">Batería</option>
+        <option value="guitarra">Guitarra</option>
+        <option value="bajo">Bajo</option>
+        <option value="piano">Piano/Teclado</option>
+        <option value="voz">Voz</option>
+        <option value="saxo">Saxo</option>
+        <option value="trompeta">Trompeta</option>
+        <option value="violin">Violín</option>
+        <option value="flauta">Flauta</option>
+        <option value="otro">Otro</option>
+      </select>
+
       <input type="file" id="scoreFile" accept=".pdf,.jpg,.jpeg,.png" />
       <div id="scoreContainer" style="margin-top: 10px; text-align: center; min-height: 400px;"></div>
+      <p id="instrumentStatus" class="hint" style="margin-top: 10px; font-weight: bold; color: #5e4aff;"></p>
     </section>
 
     <!-- Modo Profesor (Etapa 6) -->
