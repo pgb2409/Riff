@@ -238,3 +238,136 @@ window.addEventListener('resize', () => {
     }
   }
 });
+
+// === Etapa 3: Controles en vivo + loop ===
+
+// Elementos
+const offsetMinusBtn = document.getElementById('offsetMinus');
+const offsetPlusBtn = document.getElementById('offsetPlus');
+const liveOffsetDisplay = document.getElementById('liveOffsetDisplay');
+
+const jumpBack2Btn = document.getElementById('jumpBack2');
+const jumpBack1Btn = document.getElementById('jumpBack1');
+const jumpForward1Btn = document.getElementById('jumpForward1');
+const jumpForward2Btn = document.getElementById('jumpForward2');
+
+const loopFromInput = document.getElementById('loopFrom');
+const loopToInput = document.getElementById('loopTo');
+const setLoopBtn = document.getElementById('setLoop');
+const clearLoopBtn = document.getElementById('clearLoop');
+const loopStatus = document.getElementById('loopStatus');
+
+let liveFineOffset = 0; // ajuste fino adicional en tiempo real
+let loopActive = false;
+let loopFromMeasure = 1;
+let loopToMeasure = 4;
+let lastLoopKey = null;
+
+// Función para obtener clave única de loop
+function getLoopStorageKey() {
+  return currentAudioFileName ? `loop_${currentAudioFileName}` : null;
+}
+
+// Actualizar display de offset fino
+function updateLiveOffsetDisplay() {
+  liveOffsetDisplay.textContent = liveFineOffset.toFixed(1) + 's';
+}
+
+// Aplicar ajuste fino
+offsetMinusBtn.addEventListener('click', () => {
+  liveFineOffset -= 0.2;
+  updateLiveOffsetDisplay();
+  // Nota: el audio no se detiene; el offset se usa en la lógica de compás
+});
+
+offsetPlusBtn.addEventListener('click', () => {
+  liveFineOffset += 0.2;
+  updateLiveOffsetDisplay();
+});
+
+// Saltar compases
+function jumpMeasures(deltaMeasures) {
+  if (!bpm || bpm <= 0) {
+    alert('Primero ingresa un BPM válido.');
+    return;
+  }
+  const jumpTime = deltaMeasures * (60 / bpm);
+  audioPlayer.currentTime += jumpTime;
+}
+
+jumpBack2Btn.addEventListener('click', () => jumpMeasures(-2));
+jumpBack1Btn.addEventListener('click', () => jumpMeasures(-1));
+jumpForward1Btn.addEventListener('click', () => jumpMeasures(1));
+jumpForward2Btn.addEventListener('click', () => jumpMeasures(2));
+
+// Establecer loop
+setLoopBtn.addEventListener('click', () => {
+  const from = parseInt(loopFromInput.value);
+  const to = parseInt(loopToInput.value);
+  if (isNaN(from) || isNaN(to) || from < 1 || to < from) {
+    alert('Rango de compases inválido.');
+    return;
+  }
+  loopFromMeasure = from;
+  loopToMeasure = to;
+  loopActive = true;
+
+  // Guardar en localStorage
+  const key = getLoopStorageKey();
+  if (key) {
+    localStorage.setItem(key, JSON.stringify({ from, to }));
+    lastLoopKey = key;
+  }
+
+  loopStatus.textContent = `Loop activo: compases ${from} a ${to}`;
+  loopStatus.style.color = '#2c7';
+});
+
+// Limpiar loop
+clearLoopBtn.addEventListener('click', () => {
+  loopActive = false;
+  const key = getLoopStorageKey();
+  if (key) {
+    localStorage.removeItem(key);
+  }
+  loopStatus.textContent = 'Sin loop activo';
+  loopStatus.style.color = '#888';
+});
+
+// Cargar loop guardado al cambiar audio
+audioFileInput.addEventListener('change', () => {
+  const key = getLoopStorageKey();
+  if (key) {
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      const { from, to } = JSON.parse(saved);
+      loopFromInput.value = from;
+      loopToInput.value = to;
+      loopFromMeasure = from;
+      loopToMeasure = to;
+      loopStatus.textContent = `Loop guardado: compases ${from} a ${to}`;
+      loopStatus.style.color = '#2c7';
+      loopActive = true;
+    } else {
+      loopActive = false;
+      loopStatus.textContent = 'Sin loop activo';
+    }
+  }
+});
+
+// Loop automático
+audioPlayer.addEventListener('timeupdate', () => {
+  if (!loopActive || !bpm) return;
+
+  const currentTime = audioPlayer.currentTime + currentOffset + liveFineOffset;
+  const currentMeasureLoop = Math.floor(currentTime / (60 / bpm)) + 1; // compás 1-based
+
+  if (currentMeasureLoop > loopToMeasure) {
+    // Saltar al inicio del loop
+    const loopStartTime = (loopFromMeasure - 1) * (60 / bpm);
+    const targetTime = loopStartTime - currentOffset - liveFineOffset;
+    if (targetTime >= 0) {
+      audioPlayer.currentTime = targetTime;
+    }
+  }
+});
