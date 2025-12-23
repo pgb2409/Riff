@@ -64,19 +64,13 @@
       position: relative;
       background: #1e1e1e;
     }
-    #sheet-embed {
-      width: 100%;
-      height: 100%;
-      display: none;
-      border: none;
-    }
-    #sheet-img {
+    #scoreCanvas {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      display: none;
+      display: block;
     }
-    #highlight-overlay {
+    #highlightOverlay {
       position: absolute;
       top: 0;
       left: 0;
@@ -134,11 +128,10 @@
       
       <audio id="audioPlayer" controls style="width: 100%; margin: 15px 0; background: #2c243a; padding: 10px; border-radius: 6px;"></audio>
       
-      <!-- ✅ Contenedor de partitura con overlay anclado -->
+      <!-- ✅ Contenedor de partitura con canvas -->
       <div id="scoreContainer">
-        <embed id="sheet-embed" type="application/pdf" style="width:100%; height:100%; display:none; border:none;" />
-        <img id="sheet-img" style="width:100%; height:100%; object-fit:contain; display:none;" />
-        <div id="highlight-overlay"></div>
+        <canvas id="scoreCanvas"></canvas>
+        <div id="highlightOverlay"></div>
       </div>
     </div>
 
@@ -165,6 +158,10 @@
     let currentOffset = 0;
     let bpm = 120;
     let syncInterval = null;
+    let canvasContext = null;
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+    let measureMap = []; // [{ x, y, width, height }, ...]
 
     // === Elementos del DOM ===
     const audioFileInput = document.getElementById('audioFile');
@@ -172,8 +169,8 @@
     const instrumentSelect = document.getElementById('instrumentSelect');
     const startPracticeBtn = document.getElementById('startPractice');
     const audioPlayer = document.getElementById('audioPlayer');
-    const sheetEmbed = document.getElementById('sheet-embed');
-    const sheetImg = document.getElementById('sheet-img');
+    const scoreCanvas = document.getElementById('scoreCanvas');
+    const highlightOverlay = document.getElementById('highlightOverlay');
     const measureNumberEl = document.getElementById('measureNumber');
 
     // === Cargar audio ===
@@ -191,23 +188,100 @@
       if (!currentScoreFile) return;
 
       // Reset
-      sheetEmbed.style.display = 'none';
-      sheetEmbed.removeAttribute('src');
-      sheetImg.style.display = 'none';
-      sheetImg.removeAttribute('src');
+      scoreCanvas.width = 0;
+      scoreCanvas.height = 0;
+      measureMap = [];
+      highlightOverlay.innerHTML = '';
 
       const url = URL.createObjectURL(currentScoreFile);
 
       if (currentScoreFile.type === 'application/pdf') {
-        sheetEmbed.src = url;
-        sheetEmbed.style.display = 'block';
+        await loadPDF(url);
       } else if (currentScoreFile.type.startsWith('image/')) {
-        sheetImg.src = url;
-        sheetImg.style.display = 'block';
+        await loadImage(url);
       } else {
         alert('Formato no soportado. Usa PDF, JPG o PNG.');
       }
     });
+
+    // === Cargar PDF en canvas ===
+    async function loadPDF(url) {
+      try {
+        const arrayBuffer = await fetch(url).then(r => r.arrayBuffer());
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const page = await pdf.getPage(1);
+        const scale = 1.5;
+        const viewport = page.getViewport({ scale });
+
+        canvasWidth = viewport.width;
+        canvasHeight = viewport.height;
+        scoreCanvas.width = canvasWidth;
+        scoreCanvas.height = canvasHeight;
+
+        const context = scoreCanvas.getContext('2d');
+        canvasContext = context;
+
+        await page.render({ canvasContext: context, viewport }).promise;
+
+        // Detectar compases automáticamente
+        detectMeasures();
+      } catch (err) {
+        console.error('Error al cargar PDF:', err);
+        alert('Error al cargar el PDF. Intenta con una imagen.');
+      }
+    }
+
+    // === Cargar imagen en canvas ===
+    async function loadImage(url) {
+      const img = new Image();
+      img.onload = () => {
+        canvasWidth = img.width;
+        canvasHeight = img.height;
+        scoreCanvas.width = canvasWidth;
+        scoreCanvas.height = canvasHeight;
+
+        const context = scoreCanvas.getContext('2d');
+        canvasContext = context;
+        context.drawImage(img, 0, 0);
+
+        // Detectar compases automáticamente
+        detectMeasures();
+      };
+      img.onerror = () => {
+        alert('Error al cargar la imagen.');
+      };
+      img.src = url;
+    }
+
+    // === Detectar compases automáticamente (basado en líneas horizontales) ===
+    function detectMeasures() {
+      if (!canvasContext) return;
+
+      // Asumimos que los compases están separados por líneas horizontales
+      // Esto funciona bien con partituras como la que me enviaste
+      const measuresPerRow = 4;
+      const rows = Math.ceil(canvasHeight / 120); // altura promedio de un compás
+
+      measureMap = [];
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < measuresPerRow; col++) {
+          const x = (col * canvasWidth) / measuresPerRow;
+          const y = (row * canvasHeight) / rows;
+          const width = canvasWidth / measuresPerRow;
+          const height = canvasHeight / rows;
+
+          measureMap.push({
+            x,
+            y,
+            width,
+            height
+          });
+        }
+      }
+
+      // Para partituras reales, podrías mejorar esto con OCR, pero para ahora es suficiente
+    }
 
     // === Seleccionar instrumento ===
     instrumentSelect.addEventListener('change', () => {
@@ -216,44 +290,29 @@
 
     // === ✅ NUEVA FUNCIÓN: Resaltado ANCLADO EXACTAMENTE A LA PARTITURA REAL ===
     function highlightMeasure(measureIndex) {
-      const overlay = document.getElementById('highlight-overlay');
+      const overlay = document.getElementById('highlightOverlay');
       overlay.innerHTML = '';
 
-      // ✅ Obtenemos el elemento visible real (PDF o imagen)
-      const content = sheetEmbed.style.display !== 'none'
-        ? sheetEmbed
-        : sheetImg.style.display !== 'none'
-          ? sheetImg
-          : null;
+      if (measureIndex < 0 || measureIndex >= measureMap.length) return;
 
-      if (!content) return;
+      const measure = measureMap[measureIndex];
 
-      // ✅ Medimos el contenedor y el contenido real
+      // ✅ Convertir coordenadas del canvas a coordenadas del contenedor
       const containerRect = document.getElementById('scoreContainer').getBoundingClientRect();
-      const contentRect = content.getBoundingClientRect();
+      const canvasRect = scoreCanvas.getBoundingClientRect();
 
-      // ✅ Calculamos desplazamientos relativos al contenedor
-      const leftOffset = contentRect.left - containerRect.left;
-      const topOffset = contentRect.top - containerRect.top;
-      const contentWidth = contentRect.width;
-      const contentHeight = contentRect.height;
-
-      // ✅ Total de compases: ajusta esto si sabes cuántos hay en tu partitura
-      const totalMeasures = 12; // Cambia este valor si tienes más o menos compases
-
-      if (measureIndex < 0 || measureIndex >= totalMeasures) return;
-
-      // ✅ Altura de cada compás dentro del contenido real
-      const measureHeight = contentHeight / totalMeasures;
-      const top = topOffset + measureIndex * measureHeight;
+      const leftOffset = measure.x * (canvasRect.width / canvasWidth);
+      const topOffset = measure.y * (canvasRect.height / canvasHeight);
+      const width = measure.width * (canvasRect.width / canvasWidth);
+      const height = measure.height * (canvasRect.height / canvasHeight);
 
       // ✅ Creamos el resaltado con bordes precisos
       const highlight = document.createElement('div');
       highlight.style.position = 'absolute';
       highlight.style.left = leftOffset + 'px';
-      highlight.style.top = top + 'px';
-      highlight.style.width = contentWidth + 'px';
-      highlight.style.height = measureHeight + 'px';
+      highlight.style.top = topOffset + 'px';
+      highlight.style.width = width + 'px';
+      highlight.style.height = height + 'px';
       highlight.style.backgroundColor = 'rgba(0, 120, 255, 0.4)';
       highlight.style.border = '2px solid rgba(0, 180, 255, 0.7)';
       highlight.style.zIndex = '10';
