@@ -4,98 +4,102 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Domina tu instrumento</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f0c1a;
+      color: white;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #1a132a;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #5e4aff;
+    }
+    .section {
+      background: #251e35;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+    .section h2 {
+      margin-bottom: 15px;
+      color: #5e4aff;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: #2c243a;
+      color: white;
+      font-size: 1rem;
+    }
+    button {
+      background: linear-gradient(135deg, #5e4aff 0%, #3b2cff 100%);
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #scoreContainer {
+      min-height: 300px;
+      margin: 15px 0;
+      border: 1px dashed #555;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+    }
+    #scoreContainer img, #scoreContainer embed {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    #currentMeasureIndicator {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(231, 76, 60, 0.9);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      z-index: 1000;
+    }
+    .hint {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin: 10px 0;
+    }
+  </style>
 </head>
 <body>
-  <!-- Pantalla de bienvenida -->
-  <div id="welcomeScreen" class="screen">
-    <div class="header">
-      <div class="logo">
-        <div class="icon">🎵</div>
-      </div>
-      <div class="waveform"></div>
-    </div>
-    <div class="content">
-      <h1>Domina tu <span>instrumento</span></h1>
-      <p>Sincronización de audio y partituras en tiempo real con resaltado inteligente.</p>
+  <div class="container">
+    <h1>🎵 Domina tu instrumento</h1>
+    
+    <div class="section">
+      <h2>1. Prepara tu práctica</h2>
+      <p class="hint">Sube tu audio, tu partitura y elige tu instrumento. ¡La app hará el resto!</p>
       
-      <!-- Estadísticas -->
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-number" id="userCount">0</div>
-          <div class="stat-label">Usuarios registrados</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="downloadCount">0</div>
-          <div class="stat-label">Prácticas descargadas</div>
-        </div>
-      </div>
-
-      <!-- Formulario de registro -->
-      <div id="registerForm">
-        <h3>Crear cuenta</h3>
-        <input type="text" id="regName" placeholder="Nombre" />
-        <input type="text" id="regLastname" placeholder="Apellidos" />
-        <input type="email" id="regEmail" placeholder="Correo electrónico" />
-        <input type="password" id="regPassword" placeholder="Contraseña" />
-        <input type="password" id="regConfirmPassword" placeholder="Confirmar contraseña" />
-        
-        <div class="terms">
-          <label>
-            <input type="checkbox" id="termsCheckbox" />
-            Acepto los <a href="#" target="_blank">términos de uso</a>
-          </label>
-          <label>
-            <input type="checkbox" id="privacyCheckbox" />
-            He leído la <a href="#" target="_blank">política de protección de datos</a>
-          </label>
-        </div>
-        
-        <button id="registerBtn" class="btn-primary">Crear cuenta</button>
-        <p class="switch-form">¿Ya tienes cuenta? <a id="showLogin">Inicia sesión</a></p>
-      </div>
-
-      <!-- Formulario de login -->
-      <div id="loginForm" style="display: none;">
-        <h3>Iniciar sesión</h3>
-        <input type="email" id="loginEmail" placeholder="Correo electrónico" />
-        <input type="password" id="loginPassword" placeholder="Contraseña" />
-        <button id="loginBtn" class="btn-primary">Entrar</button>
-        <p class="switch-form">¿Eres nuevo? <a id="showRegister">Regístrate</a></p>
-      </div>
-
-      <div class="footer-links">
-        <p>Tus datos se guardan únicamente en tu dispositivo.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- App principal -->
-  <div id="appContainer" class="screen" style="display: none;">
-    <div class="app-header">
-      <button id="backToWelcome" class="btn-back">← Salir</button>
-      <h2>🎵 Hola, <span id="userNameDisplay">Usuario</span></h2>
-    </div>
-
-    <!-- Audio Upload -->
-    <section class="upload-section">
-      <label for="audioFile">Sube tu audio (MP3 o MP4):</label>
-      <p class="hint">Selecciona la grabación de la pieza que vas a practicar.</p>
+      <label>Audio (MP3 o MP4):</label>
       <input type="file" id="audioFile" accept="audio/mp3,audio/mpeg,video/mp4" />
-      <br />
-      <audio id="audioPlayer" controls style="width: 100%; margin-top: 10px;"></audio>
-      <br />
-      <button id="markFirstNote" disabled>La primera nota entra aquí</button>
-      <p class="hint">Reproduce el audio y haz clic en este botón exactamente cuando suene la primera nota. Esto sincroniza la partitura con el audio.</p>
-    </section>
-
-    <!-- Score Upload -->
-    <section class="upload-section">
-      <label for="scoreFile">Sube la partitura de tu instrumento (PDF, JPG o PNG):</label>
-      <p class="hint">Ej: partitura de batería, tablatura de guitarra, hoja de acordes, etc.</p>
       
-      <label for="instrumentSelect">Elige tu instrumento:</label>
-      <select id="instrumentSelect" class="instrument-select">
+      <label>Partitura (PDF, JPG o PNG):</label>
+      <input type="file" id="scoreFile" accept=".pdf,.jpg,.jpeg,.png" />
+      
+      <label>Tu instrumento:</label>
+      <select id="instrumentSelect">
         <option value="">Selecciona tu instrumento</option>
         <option value="bateria">Batería</option>
         <option value="guitarra">Guitarra</option>
@@ -108,107 +112,59 @@
         <option value="flauta">Flauta</option>
         <option value="otro">Otro</option>
       </select>
+      
+      <audio id="audioPlayer" controls style="width: 100%; margin: 15px 0; background: #2c243a; padding: 10px; border-radius: 6px;"></audio>
+      <div id="scoreContainer">Sube tu partitura para verla aquí</div>
+    </div>
 
-      <input type="file" id="scoreFile" accept=".pdf,.jpg,.jpeg,.png" />
-      <div id="scoreContainer" style="margin-top: 10px; text-align: center; min-height: 400px;"></div>
-      <p id="instrumentStatus" class="hint" style="margin-top: 10px; font-weight: bold; color: #5e4aff;"></p>
-    </section>
+    <div class="section">
+      <h2>2. ¡Practica!</h2>
+      <p class="hint">La partitura se resaltará automáticamente en tiempo real mientras suena el audio.</p>
+      <button id="startPractice">▶️ Empezar a practicar</button>
+    </div>
+  </div>
 
-    <!-- Resto de controles (BPM, loop, etc.) -->
-    <section class="control-section">
-      <label for="bpmInput">BPM (beats per minute):</label>
-      <p class="hint">Escribe el tempo de la pieza (ej. 120).</p>
-      <input type="number" id="bpmInput" min="20" max="300" placeholder="Ej. 120" />
-      <button id="startSync">Iniciar sincronización rítmica</button>
-      <p id="measureInfo">Duración de compás: -- segundos</p>
-    </section>
+  <div id="currentMeasureIndicator" style="display: none;">
+    Compás: <span id="measureNumber">0</span>
+  </div>
 
-    <section class="control-section">
-      <h3>🔁 Loop por sección</h3>
-      <label>
-        Desde compás:
-        <input type="number" id="loopFrom" min="1" value="1" />
-      </label>
-      <label>
-        Hasta compás:
-        <input type="number" id="loopTo" min="1" value="4" />
-      </label>
-      <br />
-      <button id="setLoop">Establecer loop</button>
-      <button id="clearLoop">Limpiar loop</button>
-      <p id="loopStatus">Sin loop activo</p>
-    </section>
+  <script>
+    // Estado
+    let currentAudioFile = null;
+    let currentScoreFile = null;
+    let currentInstrument = '';
+    let currentOffset = 0;
+    let bpm = 120;
+    let measureDuration = 60 / bpm;
+    let syncInterval = null;
+    let overlayCanvas = null;
 
-    <button id="exportPractice" class="btn-primary">💾 Descargar práctica offline</button>
+    // Elementos
+    const audioFileInput = document.getElementById('audioFile');
+    const scoreFileInput = document.getElementById('scoreFile');
+    const instrumentSelect = document.getElementById('instrumentSelect');
+    const startPracticeBtn = document.getElementById('startPractice');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const scoreContainer = document.getElementById('scoreContainer');
+    const measureNumberEl = document.getElementById('measureNumber');
 
-    <!-- PDF.js -->
-    <script src="pdfjs/pdf.min.js"></script>
-    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/pdf.worker.min.js';</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
-    <script>
-      // === Login/Registro/Admin (tu código original) ===
-      const usersKey = 'musicApp_users';
-      const currentUserKey = 'musicApp_currentUser';
-      const USER_COUNT_KEY = 'musicApp_userCount';
-      const DOWNLOAD_COUNT_KEY = 'musicApp_downloadCount';
-      const isAdminKey = 'musicApp_isAdmin';
-      const ADMIN_EMAIL = 'admin@mimusicapp.com';
-      const ADMIN_PASSWORD = 'admin123';
-
-      let currentAudioFileName = null;
-      let currentOffset = 0;
-
-      // Audio
-      const audioFileInput = document.getElementById('audioFile');
-      const audioPlayer = document.getElementById('audioPlayer');
-      const markFirstNoteBtn = document.getElementById('markFirstNote');
-
-      audioFileInput.addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        currentAudioFileName = file.name;
-        const url = URL.createObjectURL(file);
+    // Cargar audio
+    audioFileInput.addEventListener('change', (e) => {
+      currentAudioFile = e.target.files[0];
+      if (currentAudioFile) {
+        const url = URL.createObjectURL(currentAudioFile);
         audioPlayer.src = url;
-        markFirstNoteBtn.disabled = false;
-      });
+      }
+    });
 
-      // Botón de sincronización
-      markFirstNoteBtn.addEventListener('click', function () {
-        if (!currentAudioFileName) return;
-        const currentTime = audioPlayer.currentTime;
-        currentOffset = -currentTime;
-        alert(`Offset establecido: ${currentOffset.toFixed(1)}s`);
-      });
-
-      // Partitura
-      const scoreFileInput = document.getElementById('scoreFile');
-      const scoreContainer = document.getElementById('scoreContainer');
-      const instrumentSelect = document.getElementById('instrumentSelect');
-      const instrumentStatus = document.getElementById('instrumentStatus');
-
-      instrumentSelect.addEventListener('change', () => {
-        const labels = {
-          bateria: 'Batería', guitarra: 'Guitarra', bajo: 'Bajo',
-          piano: 'Piano/Teclado', voz: 'Voz', saxo: 'Saxo',
-          trompeta: 'Trompeta', violin: 'Violín', flauta: 'Flauta', otro: 'Otro'
-        };
-        const instrument = instrumentSelect.value;
-        if (instrument) {
-          instrumentStatus.textContent = `Practicando: ${labels[instrument]}`;
-        } else {
-          instrumentStatus.textContent = '';
-        }
-      });
-
-      scoreFileInput.addEventListener('change', async function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    // Cargar partitura
+    scoreFileInput.addEventListener('change', (e) => {
+      currentScoreFile = e.target.files[0];
+      if (currentScoreFile) {
         scoreContainer.innerHTML = '<p>Cargando partitura...</p>';
-        if (file.type === 'application/pdf') {
+        if (currentScoreFile.type === 'application/pdf') {
           try {
-            const url = URL.createObjectURL(file);
+            const url = URL.createObjectURL(currentScoreFile);
             const embed = document.createElement('embed');
             embed.src = url;
             embed.type = 'application/pdf';
@@ -217,217 +173,83 @@
             scoreContainer.innerHTML = '';
             scoreContainer.appendChild(embed);
           } catch (e) {
-            scoreContainer.innerHTML = '<p>Error al cargar PDF.</p>';
+            scoreContainer.innerHTML = '<p style="color:#ff6b6b;">Error al cargar PDF.</p>';
           }
-        } else if (file.type.startsWith('image/')) {
-          const url = URL.createObjectURL(file);
+        } else if (currentScoreFile.type.startsWith('image/')) {
+          const url = URL.createObjectURL(currentScoreFile);
           const img = document.createElement('img');
           img.src = url;
           img.style.maxWidth = '100%';
           scoreContainer.innerHTML = '';
           scoreContainer.appendChild(img);
         } else {
-          scoreContainer.innerHTML = '<p>Formato no soportado.</p>';
-        }
-      });
-
-      // Loop (SIN AUTOMÁTICO)
-      const loopFromInput = document.getElementById('loopFrom');
-      const loopToInput = document.getElementById('loopTo');
-      const setLoopBtn = document.getElementById('setLoop');
-      const clearLoopBtn = document.getElementById('clearLoop');
-      const loopStatus = document.getElementById('loopStatus');
-
-      let loopActive = false;
-      let loopFrom = 1;
-      let loopTo = 4;
-
-      setLoopBtn.addEventListener('click', () => {
-        loopFrom = parseInt(loopFromInput.value);
-        loopTo = parseInt(loopToInput.value);
-        if (isNaN(loopFrom) || isNaN(loopTo) || loopFrom < 1 || loopTo < loopFrom) {
-          alert('Rango de compases inválido.');
-          return;
-        }
-        loopActive = true;
-        loopStatus.textContent = `Loop activo: compases ${loopFrom} a ${loopTo}`;
-        loopStatus.style.color = '#2c7';
-      });
-
-      clearLoopBtn.addEventListener('click', () => {
-        loopActive = false;
-        loopStatus.textContent = 'Sin loop activo';
-        loopStatus.style.color = '#888';
-      });
-
-      // BPM
-      const bpmInput = document.getElementById('bpmInput');
-      const startSyncBtn = document.getElementById('startSync');
-      const measureInfo = document.getElementById('measureInfo');
-
-      startSyncBtn.addEventListener('click', () => {
-        const value = parseFloat(bpmInput.value);
-        if (isNaN(value) || value <= 0) {
-          alert('Ingresa un BPM válido (ej. 120)');
-          return;
-        }
-        const measureDuration = 60 / value;
-        measureInfo.textContent = `Duración de compás: ${measureDuration.toFixed(2)} segundos`;
-        alert('Sincronización iniciada. Usa los controles de loop si lo necesitas.');
-      });
-
-      // Login/Register/Admin (igual que antes)
-      function saveUser(name, lastname, email, password) {
-        let users = JSON.parse(localStorage.getItem(usersKey) || '[]');
-        const exists = users.some(u => u.email === email);
-        if (!exists) {
-          users.push({ name, lastname, email, password });
-          localStorage.setItem(usersKey, JSON.stringify(users));
-          const userCount = parseInt(localStorage.getItem(USER_COUNT_KEY) || '0') + 1;
-          localStorage.setItem(USER_COUNT_KEY, userCount.toString());
-        }
-        localStorage.setItem(currentUserKey, email);
-        return { name, lastname, email };
-      }
-
-      function login(email, password) {
-        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-          localStorage.setItem(isAdminKey, 'true');
-          return { name: 'Administrador', lastname: '', email, admin: true };
-        }
-        const users = JSON.parse(localStorage.getItem(usersKey) || '[]');
-        const user = users.find(u => u.email === email && u.password === password);
-        if (user) {
-          localStorage.setItem(currentUserKey, email);
-          localStorage.removeItem(isAdminKey);
-          return { name: user.name, lastname: user.lastname, email, admin: false };
-        }
-        return null;
-      }
-
-      function displayStats() {
-        const userCountEl = document.getElementById('userCount');
-        const downloadCountEl = document.getElementById('downloadCount');
-        if (userCountEl && downloadCountEl) {
-          const userCount = parseInt(localStorage.getItem(USER_COUNT_KEY) || '0');
-          const downloadCount = parseInt(localStorage.getItem(DOWNLOAD_COUNT_KEY) || '0');
-          userCountEl.textContent = userCount;
-          downloadCountEl.textContent = downloadCount;
+          scoreContainer.innerHTML = '<p style="color:#ff6b6b;">Formato no soportado.</p>';
         }
       }
+    });
 
-      function restoreSession() {
-        const isAdmin = localStorage.getItem(isAdminKey) === 'true';
-        const userEmail = localStorage.getItem(currentUserKey);
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const appContainer = document.getElementById('appContainer');
-        const userNameDisplay = document.getElementById('userNameDisplay');
+    // Seleccionar instrumento
+    instrumentSelect.addEventListener('change', () => {
+      currentInstrument = instrumentSelect.value;
+    });
 
-        if (isAdmin) {
-          userNameDisplay.textContent = 'Administrador';
-          welcomeScreen.style.display = 'none';
-          appContainer.style.display = 'flex';
-          setTimeout(() => {
-            appContainer.style.display = 'none';
-            welcomeScreen.style.display = 'flex';
-          }, 100);
-        } else if (userEmail) {
-          const users = JSON.parse(localStorage.getItem(usersKey) || '[]');
-          const user = users.find(u => u.email === userEmail);
-          if (user) {
-            userNameDisplay.textContent = `${user.name} ${user.lastname}`;
-            welcomeScreen.style.display = 'none';
-            appContainer.style.display = 'flex';
-            return;
-          }
-        }
-        welcomeScreen.style.display = 'flex';
-        appContainer.style.display = 'none';
+    // Crear overlay de resaltado
+    function createOverlay() {
+      if (overlayCanvas) return;
+      const rect = scoreContainer.getBoundingClientRect();
+      overlayCanvas = document.createElement('canvas');
+      overlayCanvas.width = rect.width;
+      overlayCanvas.height = rect.height;
+      overlayCanvas.style.position = 'fixed';
+      overlayCanvas.style.left = rect.left + 'px';
+      overlayCanvas.style.top = rect.top + 'px';
+      overlayCanvas.style.pointerEvents = 'none';
+      overlayCanvas.style.zIndex = '1000';
+      document.body.appendChild(overlayCanvas);
+    }
+
+    // Resaltar compás
+    function highlightMeasure(index) {
+      if (!overlayCanvas) return;
+      const ctx = overlayCanvas.getContext('2d');
+      ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+      if (index >= 0) {
+        const cols = 4;
+        const rows = 3;
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        const w = overlayCanvas.width / cols;
+        const h = overlayCanvas.height / rows;
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+        ctx.fillRect(col * w, row * h, w, h);
       }
+    }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        displayStats();
-        restoreSession();
+    // Sincronización automática
+    function startSync() {
+      document.getElementById('currentMeasureIndicator').style.display = 'block';
+      measureDuration = 60 / bpm;
+      createOverlay();
+      
+      if (syncInterval) clearInterval(syncInterval);
+      syncInterval = setInterval(() => {
+        const audioTime = audioPlayer.currentTime;
+        const syncTime = audioTime + currentOffset;
+        const currentMeasure = syncTime >= 0 ? Math.floor(syncTime / measureDuration) : -1;
+        measureNumberEl.textContent = currentMeasure + 1;
+        highlightMeasure(currentMeasure);
+      }, 100);
+    }
 
-        // Login
-        document.getElementById('showLogin').addEventListener('click', (e) => {
-          e.preventDefault();
-          document.getElementById('registerForm').style.display = 'none';
-          document.getElementById('loginForm').style.display = 'block';
-        });
-
-        document.getElementById('loginBtn').addEventListener('click', () => {
-          const email = document.getElementById('loginEmail').value.trim();
-          const password = document.getElementById('loginPassword').value;
-          const user = login(email, password);
-          if (user) {
-            if (user.admin) {
-              document.getElementById('userNameDisplay').textContent = 'Administrador';
-              document.getElementById('welcomeScreen').style.display = 'none';
-              document.getElementById('appContainer').style.display = 'flex';
-              setTimeout(() => {
-                document.getElementById('appContainer').style.display = 'none';
-                document.getElementById('welcomeScreen').style.display = 'flex';
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-              }, 100);
-            } else {
-              document.getElementById('userNameDisplay').textContent = `${user.name} ${user.lastname}`;
-              document.getElementById('welcomeScreen').style.display = 'none';
-              document.getElementById('appContainer').style.display = 'flex';
-            }
-          } else {
-            alert('Correo o contraseña incorrectos.');
-          }
-        });
-
-        // Registro
-        document.getElementById('registerBtn').addEventListener('click', () => {
-          const name = document.getElementById('regName').value.trim();
-          const lastname = document.getElementById('regLastname').value.trim();
-          const email = document.getElementById('regEmail').value.trim();
-          const password = document.getElementById('regPassword').value;
-          const confirmPassword = document.getElementById('regConfirmPassword').value;
-          const terms = document.getElementById('termsCheckbox').checked;
-          const privacy = document.getElementById('privacyCheckbox').checked;
-
-          if (!name || !lastname || !email || !password || !confirmPassword) {
-            alert('Por favor, completa todos los campos.');
-            return;
-          }
-          if (password !== confirmPassword) {
-            alert('Las contraseñas no coinciden.');
-            return;
-          }
-          if (!terms || !privacy) {
-            alert('Debes aceptar los términos y la política de privacidad.');
-            return;
-          }
-          if (!email.includes('@')) {
-            alert('Por favor, ingresa un correo válido.');
-            return;
-          }
-
-          const user = saveUser(name, lastname, email, password);
-          document.getElementById('userNameDisplay').textContent = `${user.name} ${user.lastname}`;
-          document.getElementById('welcomeScreen').style.display = 'none';
-          document.getElementById('appContainer').style.display = 'flex';
-        });
-
-        document.getElementById('showRegister').addEventListener('click', (e) => {
-          e.preventDefault();
-          document.getElementById('loginForm').style.display = 'none';
-          document.getElementById('registerForm').style.display = 'block';
-        });
-
-        document.getElementById('backToWelcome').addEventListener('click', () => {
-          localStorage.removeItem(currentUserKey);
-          localStorage.removeItem(isAdminKey);
-          document.getElementById('appContainer').style.display = 'none';
-          document.getElementById('welcomeScreen').style.display = 'flex';
-        });
-      });
-    </script>
-  </div>
+    // Empezar práctica
+    startPracticeBtn.addEventListener('click', () => {
+      if (!currentAudioFile || !currentScoreFile || !currentInstrument) {
+        alert('Por favor, sube el audio, la partitura y elige tu instrumento.');
+        return;
+      }
+      startSync();
+      alert('¡Práctica iniciada! La partitura se resaltará automáticamente.');
+    });
+  </script>
 </body>
 </html>
