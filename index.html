@@ -63,7 +63,6 @@
       overflow: hidden;
       position: relative;
     }
-    /* ✅ CORRECCIÓN: Forzar tamaño completo */
     #scoreContainer img,
     #scoreContainer embed {
       width: 100% !important;
@@ -173,7 +172,6 @@
             const embed = document.createElement('embed');
             embed.src = url;
             embed.type = 'application/pdf';
-            // ✅ No se establece width/height aquí, el CSS lo controla
             scoreContainer.innerHTML = '';
             scoreContainer.appendChild(embed);
           } catch (e) {
@@ -216,20 +214,30 @@
       scoreContainer.appendChild(overlayCanvas);
     }
 
-    // Resaltar
+    // ✅ FUNCIÓN CORREGIDA: Resaltar la partitura completa
     function highlightMeasure(index) {
       if (!overlayCanvas) return;
       const ctx = overlayCanvas.getContext('2d');
       ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-      if (index >= 0) {
-        const cols = 4;
-        const rows = 3;
-        const col = index % cols;
-        const row = Math.floor(index / cols);
-        const w = overlayCanvas.width / cols;
-        const h = overlayCanvas.height / rows;
+      
+      // Calcular el ancho de un compás (asumiendo 4 compases por línea)
+      const measuresPerLine = 4;
+      const measureWidth = overlayCanvas.width / measuresPerLine;
+      const lineHeight = overlayCanvas.height * 0.2; // 20% de la altura por línea
+      
+      // Calcular posición
+      const line = Math.floor(index / measuresPerLine);
+      const col = index % measuresPerLine;
+      
+      // Solo resaltar si está en las primeras 5 líneas (para evitar salir del canvas)
+      if (line * lineHeight < overlayCanvas.height) {
         ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
-        ctx.fillRect(col * w, row * h, w, h);
+        ctx.fillRect(
+          col * measureWidth,
+          line * lineHeight,
+          measureWidth,
+          lineHeight
+        );
       }
     }
 
