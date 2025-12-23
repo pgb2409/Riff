@@ -64,13 +64,19 @@
       position: relative;
       background: #1e1e1e;
     }
-    #scoreCanvas {
+    #sheet-embed {
+      width: 100%;
+      height: 100%;
+      display: none;
+      border: none;
+    }
+    #sheet-img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      display: block;
+      display: none;
     }
-    #highlightOverlay {
+    #highlight-overlay {
       position: absolute;
       top: 0;
       left: 0;
@@ -128,10 +134,10 @@
       
       <audio id="audioPlayer" controls style="width: 100%; margin: 15px 0; background: #2c243a; padding: 10px; border-radius: 6px;"></audio>
       
-      <!-- ✅ Contenedor de partitura con canvas -->
       <div id="scoreContainer">
-        <canvas id="scoreCanvas"></canvas>
-        <div id="highlightOverlay"></div>
+        <embed id="sheet-embed" type="application/pdf" style="width:100%; height:100%; display:none; border:none;" />
+        <img id="sheet-img" style="width:100%; height:100%; object-fit:contain; display:none;" />
+        <div id="highlight-overlay"></div>
       </div>
     </div>
 
@@ -146,9 +152,12 @@
     Compás: <span id="measureNumber">0</span>
   </div>
 
-  <!-- PDF.js -->
-  <script src="pdfjs/pdf.min.js"></script>
-  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/pdf.worker.min.js';</script>
+  <!-- PDF.js (rutas relativas para GitHub Pages) -->
+  <script src="./pdfjs/pdf.min.js"></script>
+  <script>
+    // ✅ Ruta relativa para GitHub Pages
+    pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.min.js';
+  </script>
 
   <script>
     // === Estado global ===
@@ -158,10 +167,6 @@
     let currentOffset = 0;
     let bpm = 120;
     let syncInterval = null;
-    let canvasContext = null;
-    let canvasWidth = 0;
-    let canvasHeight = 0;
-    let measureMap = []; // [{ x, y, width, height }, ...]
 
     // === Elementos del DOM ===
     const audioFileInput = document.getElementById('audioFile');
@@ -169,8 +174,8 @@
     const instrumentSelect = document.getElementById('instrumentSelect');
     const startPracticeBtn = document.getElementById('startPractice');
     const audioPlayer = document.getElementById('audioPlayer');
-    const scoreCanvas = document.getElementById('scoreCanvas');
-    const highlightOverlay = document.getElementById('highlightOverlay');
+    const sheetEmbed = document.getElementById('sheet-embed');
+    const sheetImg = document.getElementById('sheet-img');
     const measureNumberEl = document.getElementById('measureNumber');
 
     // === Cargar audio ===
@@ -183,152 +188,69 @@
     });
 
     // === Cargar partitura (PDF o imagen) ===
-    scoreFileInput.addEventListener('change', async (e) => {
+    scoreFileInput.addEventListener('change', (e) => {
       currentScoreFile = e.target.files[0];
       if (!currentScoreFile) return;
 
-      // Reset
-      scoreCanvas.width = 0;
-      scoreCanvas.height = 0;
-      measureMap = [];
-      highlightOverlay.innerHTML = '';
+      sheetEmbed.style.display = 'none';
+      sheetEmbed.removeAttribute('src');
+      sheetImg.style.display = 'none';
+      sheetImg.removeAttribute('src');
 
       const url = URL.createObjectURL(currentScoreFile);
 
       if (currentScoreFile.type === 'application/pdf') {
-        await loadPDF(url);
+        sheetEmbed.src = url;
+        sheetEmbed.style.display = 'block';
+        sheetEmbed.onerror = () => {
+          alert('No se pudo cargar el PDF. Intenta con una imagen.');
+        };
       } else if (currentScoreFile.type.startsWith('image/')) {
-        await loadImage(url);
+        sheetImg.src = url;
+        sheetImg.style.display = 'block';
       } else {
         alert('Formato no soportado. Usa PDF, JPG o PNG.');
       }
     });
-
-    // === Cargar PDF en canvas ===
-    async function loadPDF(url) {
-      try {
-        const arrayBuffer = await fetch(url).then(r => r.arrayBuffer());
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        const page = await pdf.getPage(1);
-        const scale = 1.5;
-        const viewport = page.getViewport({ scale });
-
-        canvasWidth = viewport.width;
-        canvasHeight = viewport.height;
-        scoreCanvas.width = canvasWidth;
-        scoreCanvas.height = canvasHeight;
-
-        const context = scoreCanvas.getContext('2d');
-        canvasContext = context;
-
-        await page.render({ canvasContext: context, viewport }).promise;
-
-        // Detectar compases automáticamente
-        detectMeasures();
-      } catch (err) {
-        console.error('Error al cargar PDF:', err);
-        alert('Error al cargar el PDF. Intenta con una imagen.');
-      }
-    }
-
-    // === Cargar imagen en canvas ===
-    async function loadImage(url) {
-      const img = new Image();
-      img.onload = () => {
-        canvasWidth = img.width;
-        canvasHeight = img.height;
-        scoreCanvas.width = canvasWidth;
-        scoreCanvas.height = canvasHeight;
-
-        const context = scoreCanvas.getContext('2d');
-        canvasContext = context;
-        context.drawImage(img, 0, 0);
-
-        // Detectar compases automáticamente
-        detectMeasures();
-      };
-      img.onerror = () => {
-        alert('Error al cargar la imagen.');
-      };
-      img.src = url;
-    }
-
-    // === Detectar compases automáticamente (basado en líneas horizontales) ===
-    function detectMeasures() {
-      if (!canvasContext) return;
-
-      // Asumimos que los compases están separados por líneas horizontales
-      // Esto funciona bien con partituras como la que me enviaste
-      const measuresPerRow = 4;
-      const rows = Math.ceil(canvasHeight / 120); // altura promedio de un compás
-
-      measureMap = [];
-
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < measuresPerRow; col++) {
-          const x = (col * canvasWidth) / measuresPerRow;
-          const y = (row * canvasHeight) / rows;
-          const width = canvasWidth / measuresPerRow;
-          const height = canvasHeight / rows;
-
-          measureMap.push({
-            x,
-            y,
-            width,
-            height
-          });
-        }
-      }
-
-      // Para partituras reales, podrías mejorar esto con OCR, pero para ahora es suficiente
-    }
 
     // === Seleccionar instrumento ===
     instrumentSelect.addEventListener('change', () => {
       currentInstrument = instrumentSelect.value;
     });
 
-    // === ✅ NUEVA FUNCIÓN: Resaltado ANCLADO EXACTAMENTE A LA PARTITURA REAL ===
+    // === ✅ Resaltado pequeño y útil ===
     function highlightMeasure(measureIndex) {
-      const overlay = document.getElementById('highlightOverlay');
+      const overlay = document.getElementById('highlight-overlay');
       overlay.innerHTML = '';
 
-      if (measureIndex < 0 || measureIndex >= measureMap.length) return;
+      if (measureIndex < 0) return;
 
-      const measure = measureMap[measureIndex];
+      const totalMeasures = 12; // Ajusta si tu partitura tiene más/menos compases
+      const containerHeight = 500;
+      const measureHeight = containerHeight / totalMeasures;
+      const top = measureIndex * measureHeight;
 
-      // ✅ Convertir coordenadas del canvas a coordenadas del contenedor
-      const containerRect = document.getElementById('scoreContainer').getBoundingClientRect();
-      const canvasRect = scoreCanvas.getBoundingClientRect();
-
-      const leftOffset = measure.x * (canvasRect.width / canvasWidth);
-      const topOffset = measure.y * (canvasRect.height / canvasHeight);
-      const width = measure.width * (canvasRect.width / canvasWidth);
-      const height = measure.height * (canvasRect.height / canvasHeight);
-
-      // ✅ Creamos el resaltado con bordes precisos
       const highlight = document.createElement('div');
       highlight.style.position = 'absolute';
-      highlight.style.left = leftOffset + 'px';
-      highlight.style.top = topOffset + 'px';
-      highlight.style.width = width + 'px';
-      highlight.style.height = height + 'px';
-      highlight.style.backgroundColor = 'rgba(0, 120, 255, 0.4)';
-      highlight.style.border = '2px solid rgba(0, 180, 255, 0.7)';
+      highlight.style.left = '0';
+      highlight.style.right = '0';
+      highlight.style.top = top + 'px';
+      highlight.style.height = measureHeight + 'px';
+      highlight.style.backgroundColor = 'rgba(0, 120, 255, 0.25)';
+      highlight.style.borderTop = '1px solid rgba(0, 180, 255, 0.6)';
+      highlight.style.borderBottom = '1px solid rgba(0, 180, 255, 0.6)';
       highlight.style.zIndex = '10';
       overlay.appendChild(highlight);
     }
 
     // === Calcular compás actual ===
     function calculateCurrentMeasure(currentTime, bpm) {
-      const measureDuration = 60 / bpm;
-      return Math.floor(currentTime / measureDuration);
+      return Math.floor(currentTime / (60 / bpm));
     }
 
     // === Sincronización ===
     function startSync() {
       document.getElementById('currentMeasureIndicator').style.display = 'block';
-      
       if (syncInterval) clearInterval(syncInterval);
       syncInterval = setInterval(() => {
         const audioTime = audioPlayer.currentTime;
