@@ -52,7 +52,7 @@
       cursor: pointer;
     }
     #scoreContainer {
-      height: 500px; /* ✅ Altura fija para llenar el espacio */
+      height: 500px;
       margin: 15px 0;
       border: 1px dashed #555;
       border-radius: 8px;
@@ -60,16 +60,16 @@
       align-items: center;
       justify-content: center;
       color: #aaa;
-      overflow: hidden; /* ✅ Sin scroll, todo dentro */
-      position: relative; /* ✅ Para anclar el overlay */
+      overflow: hidden;
+      position: relative;
     }
-    #scoreContainer img, #scoreContainer embed {
-      max-width: 100%;
-      max-height: 100%; /* ✅ Llena el contenedor */
-      width: auto;
-      height: auto;
-      object-fit: contain; /* ✅ Ajusta sin deformar */
-      display: block;
+    /* ✅ CORRECCIÓN: Forzar tamaño completo */
+    #scoreContainer img,
+    #scoreContainer embed {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain;
+      border: none;
     }
     #currentMeasureIndicator {
       position: fixed;
@@ -173,8 +173,7 @@
             const embed = document.createElement('embed');
             embed.src = url;
             embed.type = 'application/pdf';
-            embed.width = '100%';
-            embed.height = '100%'; /* ✅ Llena el contenedor */
+            // ✅ No se establece width/height aquí, el CSS lo controla
             scoreContainer.innerHTML = '';
             scoreContainer.appendChild(embed);
           } catch (e) {
@@ -184,11 +183,6 @@
           const url = URL.createObjectURL(currentScoreFile);
           const img = document.createElement('img');
           img.src = url;
-          img.style.maxWidth = '100%';
-          img.style.maxHeight = '100%';
-          img.style.width = 'auto';
-          img.style.height = 'auto';
-          img.style.objectFit = 'contain'; /* ✅ Ajusta sin deformar */
           scoreContainer.innerHTML = '';
           scoreContainer.appendChild(img);
         } else {
@@ -202,9 +196,8 @@
       currentInstrument = instrumentSelect.value;
     });
 
-    // ✅ FUNCIÓN CORREGIDA: Overlay anclado al contenedor
+    // Overlay anclado al contenedor
     function createOverlay() {
-      // Eliminar overlay anterior si existe
       if (overlayCanvas) {
         if (overlayCanvas.parentNode) {
           overlayCanvas.parentNode.removeChild(overlayCanvas);
@@ -212,7 +205,6 @@
         overlayCanvas = null;
       }
 
-      // Crear nuevo overlay dentro del contenedor
       overlayCanvas = document.createElement('canvas');
       overlayCanvas.width = scoreContainer.clientWidth;
       overlayCanvas.height = scoreContainer.clientHeight;
@@ -224,7 +216,7 @@
       scoreContainer.appendChild(overlayCanvas);
     }
 
-    // ✅ FUNCIÓN CORREGIDA: Resaltar dentro del contenedor
+    // Resaltar
     function highlightMeasure(index) {
       if (!overlayCanvas) return;
       const ctx = overlayCanvas.getContext('2d');
@@ -241,11 +233,11 @@
       }
     }
 
-    // Sincronización automática
+    // Sincronización
     function startSync() {
       document.getElementById('currentMeasureIndicator').style.display = 'block';
       measureDuration = 60 / bpm;
-      createOverlay(); // ✅ Overlay dentro del contenedor
+      createOverlay();
       
       if (syncInterval) clearInterval(syncInterval);
       syncInterval = setInterval(() => {
@@ -257,7 +249,7 @@
       }, 100);
     }
 
-    // Empezar práctica
+    // Empezar
     startPracticeBtn.addEventListener('click', () => {
       if (!currentAudioFile || !currentScoreFile || !currentInstrument) {
         alert('Por favor, sube el audio, la partitura y elige tu instrumento.');
