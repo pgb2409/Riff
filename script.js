@@ -1,108 +1,64 @@
-let audioPlayer = new Audio();
-let currentMeasure = 1;
-let offset = 0;
-let bpm = 120;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Domina tu instrumento</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Domina tu instrumento</h1>
 
-// === Cargar PDF: solución que SÍ muestra la partitura en todos los navegadores ===
-document.getElementById('scoreFile').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file || file.type !== 'application/pdf') return;
+  <div class="section">
+    <label>1. Sube tu archivo de audio (MP3):</label>
+    <input type="file" id="audioFile" accept="audio/mp3" />
+  </div>
 
-  const url = URL.createObjectURL(file);
-  const container = document.getElementById('scoreContainer');
-  container.innerHTML = '';
+  <div class="section">
+    <label>2. Sube tu partitura (PDF):</label>
+    <input type="file" id="scoreFile" accept=".pdf" />
+  </div>
 
-  const embed = document.createElement('embed');
-  embed.src = url + '#toolbar=0&navpanes=0&scrollbar=0';
-  embed.type = 'application/pdf';
-  embed.width = '100%';
-  embed.height = '100%';
-  embed.style.border = 'none';
+  <div class="section">
+    <label>3. Elige tu instrumento:</label>
+    <select id="instrument">
+      <option value="voz">Voz</option>
+      <option value="guitarra-electrica">Guitarra eléctrica</option>
+      <option value="guitarra-acustica">Guitarra acústica</option>
+      <option value="bajo">Bajo eléctrico</option>
+      <option value="bateria">Batería</option>
+      <option value="piano">Piano</option>
+      <option value="teclados">Teclados / sintetizador</option>
+      <option value="saxofon">Saxofón</option>
+      <option value="trompeta">Trompeta</option>
+      <option value="violin">Violín</option>
+    </select>
+  </div>
 
-  container.appendChild(embed);
+  <div id="audioControls" style="display:none; margin:20px 0;">
+    <button id="playPause">▶ Reproducir</button>
+    <button id="adjustMinus">–0.2s</button>
+    <input type="number" id="offsetInput" value="0" step="0.1" style="width:60px;" />
+    <button id="adjustPlus">+0.2s</button>
+    <span id="timeDisplay">0:00 / 0:00</span>
+    <span id="currentMeasure" style="margin-left:15px; color:#ffcc00;">Compás: 1</span>
+  </div>
 
-  // Ajustar overlay al tamaño del contenedor
-  const overlay = document.getElementById('measureHighlightOverlay');
-  const rect = container.getBoundingClientRect();
-  overlay.style.width = rect.width + 'px';
-  overlay.style.height = rect.height + 'px';
-  overlay.style.left = rect.left + 'px';
-  overlay.style.top = rect.top + 'px';
-});
+  <!-- Contenedor del PDF -->
+  <div id="scoreContainer" style="position: relative; width:100%; height:600px; margin-top:20px; border:1px solid #444; background:#1a1a2e;"></div>
 
-// === Cargar audio ===
-document.getElementById('audioFile').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  audioPlayer.src = URL.createObjectURL(file);
-  document.getElementById('audioControls').style.display = 'block';
-});
+  <div style="margin-top:20px;">
+    <button id="prev2">&lt;&lt; 2</button>
+    <button id="prev1">&lt; 1</button>
+    <button id="next1">1 &gt;</button>
+    <button id="next2">2 &gt;&gt;</button>
+  </div>
 
-// === Reproducción ===
-document.getElementById('playPause').addEventListener('click', () => {
-  if (audioPlayer.paused) {
-    audioPlayer.play();
-    document.getElementById('playPause').textContent = '❚❚ Pausa';
-  } else {
-    audioPlayer.pause();
-    document.getElementById('playPause').textContent = '▶ Reproducir';
-  }
-});
-
-// === Sincronización en tiempo real ===
-audioPlayer.addEventListener('timeupdate', () => {
-  const time = audioPlayer.currentTime - offset;
-  currentMeasure = time < 0 ? 1 : Math.floor((time * bpm) / 60 / 4) + 1;
-  document.getElementById('currentMeasure').textContent = `Compás: ${currentMeasure}`;
-  highlightMeasure(currentMeasure);
-});
-
-// === Resaltado anclado al contenedor del PDF (sin cambios) ===
-function highlightMeasure(measure) {
-  const overlay = document.getElementById('measureHighlightOverlay');
-  overlay.innerHTML = '';
-
-  if (measure < 1 || measure > 12) return;
-
-  const cols = 4;
-  const rows = 3;
-  const col = (measure - 1) % cols;
-  const row = Math.floor((measure - 1) / cols);
-
-  const w = overlay.offsetWidth / cols;
-  const h = overlay.offsetHeight / rows;
-
-  const div = document.createElement('div');
-  div.style.position = 'absolute';
-  div.style.left = col * w + 'px';
-  div.style.top = row * h + 'px';
-  div.style.width = w + 'px';
-  div.style.height = h + 'px';
-  div.style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
-  div.style.border = '2px solid gold';
-  div.style.boxSizing = 'border-box';
-
-  overlay.appendChild(div);
-}
-
-// === Ajuste fino de sincronización ===
-document.getElementById('adjustPlus').addEventListener('click', () => {
-  offset += 0.2;
-  document.getElementById('offsetInput').value = offset.toFixed(1);
-});
-document.getElementById('adjustMinus').addEventListener('click', () => {
-  offset -= 0.2;
-  document.getElementById('offsetInput').value = offset.toFixed(1);
-});
-
-// === Saltos en compases ===
-document.getElementById('prev2').addEventListener('click', () => jumpMeasures(-2));
-document.getElementById('prev1').addEventListener('click', () => jumpMeasures(-1));
-document.getElementById('next1').addEventListener('click', () => jumpMeasures(1));
-document.getElementById('next2').addEventListener('click', () => jumpMeasures(2));
-
-function jumpMeasures(delta) {
-  const newMeasure = Math.max(1, currentMeasure + delta);
-  const newTime = ((newMeasure - 1) * 4 * 60) / bpm + offset;
-  audioPlayer.currentTime = Math.max(0, newTime);
-}
+  <!-- PDF.js -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
