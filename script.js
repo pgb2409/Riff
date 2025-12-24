@@ -3,7 +3,7 @@ let currentMeasure = 1;
 let offset = 0;
 let bpm = 120;
 
-// === Cargar PDF: usamos un objeto <embed> que sí se ve en todos los navegadores ===
+// === Cargar PDF con iframe (funciona en todos los navegadores) ===
 document.getElementById('scoreFile').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file || file.type !== 'application/pdf') return;
@@ -12,12 +12,13 @@ document.getElementById('scoreFile').addEventListener('change', (e) => {
   const container = document.getElementById('scoreContainer');
   container.innerHTML = '';
 
-  const embed = document.createElement('embed');
-  embed.src = url;
-  embed.type = 'application/pdf';
-  embed.width = '100%';
-  embed.height = '100%';
-  container.appendChild(embed);
+  const iframe = document.createElement('iframe');
+  iframe.src = url;
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.border = 'none';
+
+  container.appendChild(iframe);
 
   // Ajustar overlay al tamaño del contenedor
   const overlay = document.getElementById('measureHighlightOverlay');
@@ -26,6 +27,15 @@ document.getElementById('scoreFile').addEventListener('change', (e) => {
   overlay.style.height = rect.height + 'px';
   overlay.style.left = rect.left + 'px';
   overlay.style.top = rect.top + 'px';
+
+  // Reajustar al cambiar tamaño
+  window.addEventListener('resize', () => {
+    const rect = container.getBoundingClientRect();
+    overlay.style.width = rect.width + 'px';
+    overlay.style.height = rect.height + 'px';
+    overlay.style.left = rect.left + 'px';
+    overlay.style.top = rect.top + 'px';
+  });
 });
 
 // === Cargar audio ===
@@ -55,7 +65,7 @@ audioPlayer.addEventListener('timeupdate', () => {
   highlightMeasure(currentMeasure);
 });
 
-// === Resaltado del compás (4 columnas x 3 filas = 12 compases) ===
+// === Resaltado del compás (anclado al contenedor del PDF) ===
 function highlightMeasure(measure) {
   const overlay = document.getElementById('measureHighlightOverlay');
   overlay.innerHTML = '';
