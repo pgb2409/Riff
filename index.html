@@ -9,31 +9,32 @@
 <body>
   <h1>Domina tu instrumento</h1>
 
-  <!-- Paso 1: Subir MP3 -->
   <div class="section">
     <label>1. Sube tu archivo de audio (MP3):</label>
-    <input type="file" id="audioFile" accept="audio/mp3" required />
+    <input type="file" id="audioFile" accept="audio/mp3" />
   </div>
 
-  <!-- Paso 2: Subir PDF -->
   <div class="section">
     <label>2. Sube tu partitura (PDF):</label>
-    <input type="file" id="scoreFile" accept=".pdf" required />
+    <input type="file" id="scoreFile" accept=".pdf" />
   </div>
 
-  <!-- Paso 3: Elegir instrumento -->
   <div class="section">
     <label>3. Elige tu instrumento:</label>
     <select id="instrument">
-      <option value="piano">Piano</option>
-      <option value="guitarra">Guitarra</option>
       <option value="voz">Voz</option>
+      <option value="guitarra-electrica">Guitarra eléctrica</option>
+      <option value="guitarra-acustica">Guitarra acústica</option>
+      <option value="bajo">Bajo eléctrico</option>
+      <option value="bateria">Batería</option>
+      <option value="piano">Piano</option>
+      <option value="teclados">Teclados / sintetizador</option>
+      <option value="saxofon">Saxofón</option>
+      <option value="trompeta">Trompeta</option>
       <option value="violin">Violín</option>
-      <option value="flauta">Flauta</option>
     </select>
   </div>
 
-  <!-- Controles de audio -->
   <div id="audioControls" style="display:none; margin:20px 0;">
     <button id="playPause">▶ Reproducir</button>
     <button id="adjustMinus">–0.2s</button>
@@ -44,16 +45,15 @@
   </div>
 
   <!-- Contenedor del PDF -->
-  <div id="scoreContainer" style="position: relative; width: 100%; height: 600px; border: 1px solid #444; overflow: hidden;">
-    <div style="position: absolute; top:50%; left:50%; transform:translate(-50%, -50%); color:#666;">
+  <div id="scoreContainer" style="position: relative; width:100%; height:600px; margin-top:20px; border:1px solid #444; background:#1a1a2e;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#666; text-align:center;">
       Sube un PDF para ver la partitura
     </div>
   </div>
 
-  <!-- Overlay de resaltado -->
-  <div id="measureHighlightOverlay" style="position: absolute; top:0; left:0; width:0; height:0; pointer-events: none; z-index: 10;"></div>
+  <!-- Overlay de resaltado (encima del PDF) -->
+  <div id="measureHighlightOverlay" style="position:absolute; top:0; left:0; width:0; height:0; pointer-events:none; z-index:10;"></div>
 
-  <!-- Botones de navegación -->
   <div style="margin-top:20px;">
     <button id="prev2">&lt;&lt; 2</button>
     <button id="prev1">&lt; 1</button>
